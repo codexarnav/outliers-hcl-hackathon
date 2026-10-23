@@ -35,6 +35,38 @@ def test_scope_applicability():
     assert is_scope_applicable("B.Tech CSE,B.Tech IT", "B.Tech CSE")
     assert not is_scope_applicable("B.Tech CSE", "B.Tech ME")
 
+def test_cohort_ordinance_precedence():
+    """Verify older cohort retains DTU-ORD-2021 ordinance when evaluating in 2026."""
+    test_chunks = [
+        {
+            "doc_id": "DTU-ORD-2021",
+            "section": "Clause R.1(B).22",
+            "authority_level": 1,
+            "effective_from": "2021-08-01",
+            "effective_to": "",
+            "scope_batches": "2021,2022,2023",
+            "supersedes": "DTU-ORD-2019",
+            "text": "2021 Ordinance applies to 2021-2023 cohorts."
+        },
+        {
+            "doc_id": "DTU-ORD-2024",
+            "section": "Clause R.1(B).22",
+            "authority_level": 1,
+            "effective_from": "2024-07-01",
+            "effective_to": "",
+            "scope_batches": "2024+",
+            "supersedes": "DTU-ORD-2021",
+            "text": "2024 Ordinance applies to 2024+ cohorts."
+        }
+    ]
+    # For a 2023 batch student queried in 2026:
+    res_2023 = resolve_precedence(test_chunks, as_of_date="2026-10-23", batch_year="2023")
+    assert res_2023["winning_chunk"]["doc_id"] == "DTU-ORD-2021"
+
+    # For a 2024 batch student queried in 2026:
+    res_2024 = resolve_precedence(test_chunks, as_of_date="2026-10-23", batch_year="2024")
+    assert res_2024["winning_chunk"]["doc_id"] == "DTU-ORD-2024"
+
 def test_unresolved_conflict_detection():
     test_chunks = [
         {"doc_id": "CIRCULAR-A", "section": "Clause 1", "authority_level": 2, "effective_from": "2024-08-01", "supersedes": "", "text": "Rule A"},

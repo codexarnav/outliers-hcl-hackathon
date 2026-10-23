@@ -153,36 +153,37 @@
 
 ### Completed Milestones
 - [x] Initialized Git repository, set tracking branch to `origin/main`.
-- [x] **PR #1 Created:** `feat/foundation-dtu-corpus-and-mock` (PR #1: https://github.com/codexarnav/outliers-hcl-hackathon/pull/1)
+- [x] **PR #1 Created & Updated:** `feat/foundation-dtu-corpus-and-mock` (PR #1: https://github.com/codexarnav/outliers-hcl-hackathon/pull/1)
   - Scaffolding, `.env.example` with `MOCK_LLM=true` support, `core/config.py`.
   - Authentic DTU document acquisition (`scripts/scrape_dtu.py`), `data/source_register.csv`, `data/seed_rules.sql`.
-- [x] **PR #2 Created:** `feat/sqlite-student-kit` (PR #2: https://github.com/codexarnav/outliers-hcl-hackathon/pull/2)
+  - **Greptile Code Review Addressed:**
+    - `pyproject.toml`: Added setuptools flat-layout discovery (`[tool.setuptools.packages.find]`) to prevent editable build crashes.
+    - `pyproject.toml`: Added missing script dependencies (`reportlab`, `beautifulsoup4`, `pyyaml`).
+    - `data/source_register.csv`: Retained DTU-ORD-2021 validity for 2021–2023 cohorts by clearing `effective_to`.
+    - `data/source_register.csv`: Updated document provenance pointers to official canonical HTTPS links.
+    - `scripts/scrape_dtu.py`: Pinned SHA-256 integrity verification (`e5ce24d...`) for `DTU-ORD-2021.pdf`.
+    - `data/seed_rules.sql` & circulars: Replaced discrete intervals with continuous percentage slabs (`95.0,100.0`, etc.) to eliminate undefined fractional attendance gaps.
+- [x] **PR #2 Created & Updated:** `feat/sqlite-student-kit` (PR #2: https://github.com/codexarnav/outliers-hcl-hackathon/pull/2)
   - SQLite schema (`core/database.py`) for Annex C tables & Annex D `audit_log`.
-  - Synthetic student generator (`scripts/generate_students.py`) with edge cases `S1001`–`S1008`.
-  - Strict validator (`scripts/validate_students.py`) & Section 4.2 CLI loader (`scripts/load_students.py`).
-  - Annex E Data Card (`docs/DATA_CARD.md`).
-- [x] **Phase 3 Local Implementation:** `feat/hybrid-retrieval-precedence`
-  - Section-aware hierarchical chunking (`core/chunking.py`) extracting 373 chunks across DTU ordinances and circulars.
-  - Hybrid retrieval engine (`core/retrieval.py`): SQLite FTS5 BM25 sparse search + ChromaDB dense search + Reciprocal Rank Fusion (RRF) + exact-phrase boost. Tested and working!
-  - Annex A Source Precedence Policy engine (`core/precedence.py`): 5-step deterministic resolution, handling applicability, supersession, authority levels (1-5), and recency.
-  - Unit tests (`tests/test_precedence.py`, `tests/test_retrieval.py`): All pytest suites passing.
+  - **Synthetic Dataset Upgraded to Full 60-Student Corpus:**
+    - Integrated `synthetic_student_dataset_full` (60 students across B.Tech CSE & IT, batches 2023 & 2024, 12 courses, 180 attendance records, 181 results).
+    - Added comprehensive `edge_case_manifest.json` indexing all boundary conditions (75.0% cut-off, detention, supplementary attempts, 39 marks failure, 7.00 CGPA boundaries).
+    - Integrated `sql/derived_features.sql` with deterministic SQL views (`v_attendance_pct`, `v_attendance_status`, `v_marks_gap`, `v_student_overview`).
+    - Validated by both `scripts/validate_students.py` and `scripts/validate_data.py` (0 errors, 0 warnings).
+    - Annex E Data Card (`docs/DATA_CARD.md`) fully updated.
+- [x] **PR #3 Created & Updated:** `feat/hybrid-retrieval-precedence` (PR #3: https://github.com/codexarnav/outliers-hcl-hackathon/pull/3)
+  - Section-aware hierarchical chunking (`core/chunking.py`) extracting chunks across DTU ordinances and circulars.
+  - Hybrid retrieval engine (`core/retrieval.py`): SQLite FTS5 BM25 sparse search + ChromaDB dense search + Reciprocal Rank Fusion (RRF) + exact-phrase boost.
+  - Annex A Source Precedence Policy engine (`core/precedence.py`): 5-step deterministic resolution, handling applicability, supersession, authority levels (1-5), recency, and cohort ordinance preservation.
+  - Merged PR #2 and PR #1 updates into PR #3; all 32 unit tests passing in ~0.18s!
 
-### Team Collaboration & Merging Protocol
-* **Active Teammate Step:** Teammate is pushing their scraping branch to `codexarnav/outliers-hcl-hackathon`.
-* **Incoming Integration Flow:**
-  1. Fetch and checkout teammate's branch:
-     ```bash
-     git fetch origin
-     git checkout <teammate-branch>
-     ```
-  2. Finalize & harmonize teammate's scraping scripts with `data/source_register.csv` and `data/documents/`.
-  3. Merge finalized scraping into `main`:
-     ```bash
-     git checkout main
-     git merge <teammate-branch>
-     git push origin main
-     ```
-  4. Rebase and re-target subsequent PRs (Phase 2 `feat/sqlite-student-kit`, Phase 3 `feat/hybrid-retrieval-precedence`) onto `main`.
+### Team Collaboration & Merging Status
+* **Teammate Scraper Merged:** Teammate branch `features/scrapper` was reviewed, enhanced to support Annex B schema and Annex A authority levels (1–5), merged into `main`, and pushed to `origin/main`.
+* **Current PR Stack:**
+  - PR #1: `feat/foundation-dtu-corpus-and-mock` -> `main`
+  - PR #2: `feat/sqlite-student-kit` -> `feat/foundation-dtu-corpus-and-mock`
+  - PR #3: `feat/hybrid-retrieval-precedence` -> `feat/sqlite-student-kit`
+* **Test Suite:** 32 unit tests passing cleanly (`uv run pytest tests/`). Student validation suites passing cleanly (`validate_students.py`, `validate_data.py`).
 
 ---
 
