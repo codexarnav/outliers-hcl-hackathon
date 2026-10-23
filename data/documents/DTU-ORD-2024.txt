@@ -1,0 +1,54 @@
+DELHI TECHNOLOGICAL UNIVERSITY
+(Formerly Delhi College of Engineering)
+Shahbad Daulatpur, Bawana Road, Delhi-110042
+ORDINANCE, REGULATIONS & SCHEME OF TEACHING AND EXAMINATIONS
+B.TECH. PROGRAMMES (2024 ONWARDS)
+
+Clause R.1(B).1: Preamble and Structure of B.Tech Programmes
+Delhi Technological University offers four-year Bachelor of Technology (B.Tech) degree programmes in Computer Science and Engineering, Information Technology, Electronics and Communication Engineering, Mechanical Engineering, and allied branches. The academic year is divided into two regular semesters (Odd and Even) and an optional Summer Semester.
+
+Clause R.1(B).10: Academic Registration and Advising
+Every student must register for approved courses at the commencement of each semester on the university academic portal. Registration is confirmed only upon full payment of the notified semester fees. A student who fails to register within the stipulated registration period is deemed to have dropped the semester.
+
+Clause R.1(B).11: Course Registration and Credit Limits
+A student must register for a minimum of 16 credits and a maximum of 28 credits in any regular semester. In case of active backlogs from previous semesters, priority must be given to registering for backlog courses before enrolling in new core or elective courses.
+
+Clause R.1(B).15: Course Evaluation and Promotion Criteria
+i. Course Evaluation: The evaluation of students in theory courses comprises Continuous Work Sessional (CWS) carrying 25 marks, Mid-Term Examination (MTE) carrying 25 marks, and End-Term Examination (ETE) carrying 50 marks, totaling 100 marks.
+ii. Minimum Passing Standard: A student must secure an aggregate of at least 40.0% marks (internal plus external) in a course to be awarded a passing grade (grade 'P' or above). Scoring below 40.0% results in the award of an 'F' (Fail) grade.
+iii. Minimum Promotion Thresholds: To register for the 3rd semester (2nd year), a student must have earned at least 50% of the total credits prescribed for the 1st year. To register for the 5th semester (3rd year), a student cannot have more than four (4) active backlog courses from the preceding semesters. A student with five or more active backlogs is detained from entering the 3rd year until backlog courses are cleared.
+
+Clause R.1(B).17: Grading System and Performance Assessment
+The academic performance of every student is graded on a 10-point scale. Letter grades and corresponding numerical grade points are awarded as follows:
+- Grade 'O' (Outstanding): Grade point 10 (Cut-off >= 90% or relative formula mean + 1.5 sigma)
+- Grade 'A+' (Excellent): Grade point 9 (Cut-off >= 82%)
+- Grade 'A' (Very Good): Grade point 8 (Cut-off >= 74%)
+- Grade 'B+' (Good): Grade point 7 (Cut-off >= 66%)
+- Grade 'B' (Above Average): Grade point 6 (Cut-off >= 58%)
+- Grade 'C' (Average): Grade point 5 (Cut-off >= 50%)
+- Grade 'P' (Pass): Grade point 4 (Cut-off >= 40.0%)
+- Grade 'F' (Fail): Grade point 0 (Below 40.0% marks or detained due to attendance shortage)
+Cumulative Grade Point Average (CGPA) is computed as the credit-weighted average of grade points secured in all completed courses.
+
+Clause R.1(B).18: Grade Moderation Committee and Results
+The Board of Studies of each academic department constitutes a Grade Moderation Committee chaired by the Head of Department. The committee verifies adherence to standard grading cut-offs and relative moderation boundaries before forwarding final grades to the Controller of Examinations. In marginal cases near the 40.0% pass boundary, moderation up to 2 marks may be applied uniformly.
+
+Clause R.1(B).21: Unfair Means in Examinations
+Adopting unfair means during examinations, copying, plagiarism in project reports, or communication in the examination hall warrants strict disciplinary action by the Unfair Means Scrutiny Committee. Penalties range from cancellation of the specific paper to debarment from university examinations for up to two academic semesters.
+
+Clause R.1(B).22: Attendance, Absence, Leave and Withdrawals
+i. Attendance Obligation: All registered undergraduate students are expected to attend every lecture, tutorial, practical, and design studio session scheduled for each registered course.
+ii. Mandatory Minimum Attendance: Every student must maintain a minimum attendance of 75.0% of the total number of classes held in a subject during the semester to be eligible to appear in the End-Term Examination for that subject. A student whose attendance falls below 75.0% is detained from the end-term examination in that course and awarded an 'F' grade.
+iii. Medical Condonation by Dean Academic (UG): The Dean Academic (UG), authorized by the Vice Chancellor, may relax the minimum attendance requirement by up to 10.0% (down to 65.0% minimum attendance) for reasons to be recorded. This relaxation is admissible exclusively on certified medical hospitalization grounds, severe illness, or sanctioned representation of the university in inter-university sports or technical competitions. The student must submit authentic medical certificates to the Dean Academic (UG) through the Head of Department within seven (7) working days of resuming classes.
+iv. Exceptional Condonation by Vice Chancellor: Under extraordinary and rare circumstances, the Vice Chancellor may further relax attendance by up to 5.0% (down to 60.0% absolute floor). No student with attendance below 60.0% shall be permitted to appear in the End-Term Examination under any circumstances.
+v. Continuous Work Sessional Attendance Component: Discrete marks (up to 5 marks) within the CWS component are awarded on the basis of attendance percentage slabs as notified by the Dean Academic (UG).
+
+Clause R.1(B).23: Make-up Examinations on Medical / Extraordinary Grounds
+Students who have missed the Mid-Term Examination or End-Term Examination of a course due to genuine medical emergency, hospitalization, or bereavement in the immediate family may be permitted to take a Make-up Examination. Make-up examinations are permissible only if the student had fulfilled the 75.0% minimum attendance requirement and had not been detained earlier. Application must be submitted to the Head of Department within ten (10) working days of the scheduled examination. Make-up examinations award full regular letter grades.
+
+Clause R.1(B).24: Course and Semester Withdrawal
+i. Course Withdrawal: A student wishing to withdraw from a registered course must apply through the Head of Department to the Controller of Examinations within one week of the conclusion of the Mid-Term Examination. A withdrawn course carries a 'W' grade and does not count towards backlog penalty.
+ii. Semester Withdrawal: In case of continuous incapacitation exceeding four weeks, a student may apply for complete withdrawal from the entire semester prior to the commencement of the End-Term Examination. Partial withdrawal from selected subjects during semester withdrawal is prohibited.
+
+Clause R.1(B).25: Termination of Enrolment
+A student enrolled in the first year who is continuously absent from classes for more than four weeks without prior written permission shall have their name struck off the university rolls.
