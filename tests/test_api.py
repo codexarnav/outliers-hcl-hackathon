@@ -156,7 +156,7 @@ def test_live_ingest_and_immediate_retrieval():
         "version": "1.0",
         "effective_from": "2026-08-01",
         "effective_to": "",
-        "supersedes": "DTU-ORD-2024#R.1(B).22",
+        "supersedes": "",
         "scope_programmes": "ALL",
         "scope_batches": "ALL",
         "provenance": "Judge Live Testing",

@@ -284,13 +284,9 @@ def rerank_candidates(query: str, candidates: List[Dict[str, Any]], top_k: int =
         score += matching_words * 0.01
 
         # Boost for exact clause citations
-        for term in ["r.1(b).22", "attendance", "supplementary", "cws", "fee", "make-up", "fail"]:
+        for term in ["r.1(b).22", "supplementary", "cws", "make-up"]:
             if term in q_lower and term in text_lower:
                 score += 0.05
-
-        # Boost for primary regulation level
-        if item.get("authority_level") == 1:
-            score += 0.01
 
         item["score"] = round(score, 4)
 

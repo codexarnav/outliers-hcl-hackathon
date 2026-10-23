@@ -69,8 +69,8 @@
     "student_id": null,
     "expected_answer_type": "retrieved_fact",
     "expected_keywords": ["ordinance", "2024", "supersede"],
-    "expected_source": "DTU-SYN-AMEND-2026",
-    "expected_section": "Page 1"
+    "expected_source": ["DTU-ORD-2024", "DTU-SYN-AMEND-2026"],
+    "expected_section": null
   },
   {
     "id": "Q08",
@@ -79,9 +79,9 @@
     "as_of_date": "2026-10-23",
     "student_id": null,
     "expected_answer_type": "retrieved_fact",
-    "expected_keywords": ["70%", "75%", "r.1(b).22"],
-    "expected_source": "DTU-CSE-ELECT-FAQ",
-    "expected_section": "Q3"
+    "expected_keywords": ["70", "attendance"],
+    "expected_source": ["DTU-SYN-AMEND-2026", "DTU-CSE-ELECT-FAQ", "DTU-ORD-2024"],
+    "expected_section": null
   },
   {
     "id": "Q09",

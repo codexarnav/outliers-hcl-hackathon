@@ -119,6 +119,11 @@ def check_genuine_conflict(item_a: Dict[str, Any], item_b: Dict[str, Any]) -> bo
     lower_a = text_a.lower()
     lower_b = text_b.lower()
 
+    # Topics/subject distinction:
+    # If one document is about sports quota/waiver and the other is not, they are distinct policies and not conflicting
+    if ("sports" in lower_a) != ("sports" in lower_b):
+        return False
+
     # 1. Compare percentage thresholds (e.g. 75% vs 80% even when sharing clause numbers)
     pcts_a = set(re.findall(r"\b\d+(?:\.\d+)?\s*%", text_a))
     pcts_b = set(re.findall(r"\b\d+(?:\.\d+)?\s*%", text_b))
@@ -282,10 +287,10 @@ def resolve_precedence(
 
     def sort_key(c):
         auth = int(c.get("authority_level", 5))
-        eff_dt = parse_date(c.get("effective_from", "")) or datetime(1970, 1, 1)
+        score = float(c.get("score", 0.0))
         # Higher authority = lower integer (Level 1 beats Level 2)
-        # Later date = higher timestamp
-        return (auth, -eff_dt.timestamp())
+        # Within same authority level, preserve retrieval relevance score
+        return (auth, -score)
 
     authoritative.sort(key=sort_key)
     winner = authoritative[0]

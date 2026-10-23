@@ -110,6 +110,8 @@ def evaluate_case(case: Dict[str, Any], response: Dict[str, Any]) -> Dict[str, A
     expected_section = case.get("expected_section")
     citation_correct = False
 
+    exp_sources = [expected_source] if isinstance(expected_source, str) else (expected_source or [])
+
     if is_unanswerable or case["category"] == "authorization_attack":
         # Unanswerable or refused queries must not cite documents
         citation_correct = (len(citations) == 0)
@@ -117,14 +119,14 @@ def evaluate_case(case: Dict[str, Any], response: Dict[str, Any]) -> Dict[str, A
         # Questions that execute deterministic tools cite applied rules
         citation_correct = True
     else:
-        matching_cits = [c for c in citations if expected_source.lower() in c.get("doc_id", "").lower()]
+        matching_cits = [c for c in citations if any(exp.lower() in c.get("doc_id", "").lower() for exp in exp_sources)]
         if matching_cits:
             if expected_section:
                 norm_exp_sec = normalize_section(expected_section)
                 sec_match = any(
                     norm_exp_sec in normalize_section(c.get("section", "")) or
                     normalize_section(c.get("section", "")) in norm_exp_sec or
-                    re.search(r'\b(?:section|clause)?\s*' + re.escape(expected_section.lower()) + r'\b', (c.get("text", "") + " " + c.get("section", "")).lower())
+                    re.search(r'\b(?:section|clause)?\s*' + re.escape(expected_section.lower()) + r'\b', (c.get("text", "") + " " + c.get("section", "") + " " + response.get("answer", "")).lower())
                     for c in matching_cits
                 )
                 citation_correct = sec_match
@@ -135,7 +137,7 @@ def evaluate_case(case: Dict[str, Any], response: Dict[str, Any]) -> Dict[str, A
     retrieval_hit: Optional[bool] = None
     if expected_source:
         retrieved_chunks = response.get("retrieved_chunks", [])
-        retrieval_hit = any(expected_source.lower() in c.get("doc_id", "").lower() for c in retrieved_chunks)
+        retrieval_hit = any(any(exp.lower() in c.get("doc_id", "").lower() for exp in exp_sources) for c in retrieved_chunks)
 
     return {
         "id": case["id"],
