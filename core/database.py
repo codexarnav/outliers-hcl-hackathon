@@ -129,6 +129,12 @@ def init_db():
         );
         """)
 
+        # 7. Derived feature views for deterministic evaluation
+        derived_sql_path = Path(__file__).resolve().parent.parent / "sql" / "derived_features.sql"
+        if derived_sql_path.exists():
+            with open(derived_sql_path, "r", encoding="utf-8") as f:
+                conn.executescript(f.read())
+
         # Seed rule_registry if empty
         cur = conn.execute("SELECT COUNT(*) FROM rule_registry")
         if cur.fetchone()[0] == 0:

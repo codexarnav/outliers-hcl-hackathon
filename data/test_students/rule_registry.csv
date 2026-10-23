@@ -1,0 +1,5 @@
+rule_id,description,parameter,operator,value,scope_programmes,scope_batches,effective_from,effective_to,source_doc_id,source_section
+ATT-MIN-01,Minimum attendance required for examination eligibility under the synthetic base policy.,min_attendance_pct,>=,75,ALL,ALL,2025-01-01,,SRC-ATT-001,Section 2.1
+EXAM-PASS-01,Minimum total marks required to pass a regular course examination under the synthetic policy.,min_total_marks,>=,40,ALL,ALL,2025-01-01,,SRC-EXAM-001,Section 3.2
+PLAC-CGPA-01,Synthetic placement eligibility CGPA cutoff for test scenarios.,placement_min_cgpa,>=,7.00,ALL,ALL,2025-01-01,,SRC-PLAC-001,Section 1.1
+ATT-MIN-02,"Future revised minimum attendance threshold, effective from 2027; not active for the 2026 dataset snapshot.",min_attendance_pct,>=,80,ALL,ALL,2027-01-01,,SRC-CIRC-002,"Circular 2, Clause 1"
