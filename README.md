@@ -1,168 +1,242 @@
-# DTU Polite PDF Scraper (Stage 1 Data Pipeline)
+# AI-Powered University Student Services Assistant
 
-A robust, polite, and compliant web scraper built for Delhi Technological University ([dtu.ac.in](https://dtu.ac.in)). This tool downloads PDF documents exclusively from the **Notices**, **Jobs**, and **Tenders** sections, validates them, hashes their content using SHA-256, stores them in a flat-file raw cache, and indexes them in a streaming `manifest.jsonl`.
+[![Build & Test](https://img.shields.io/badge/pytest-60%20passed-brightgreen.svg)]()
+[![Evaluation](https://img.shields.io/badge/benchmark-100%25%20correctness-brightgreen.svg)]()
+[![Contract](https://img.shields.io/badge/FastAPI-Section%206%20Compliant-blue.svg)]()
+[![Mode](https://img.shields.io/badge/MOCK__LLM-true%20supported-orange.svg)]()
+[![Target](https://img.shields.io/badge/University-Delhi%20Technological%20University-red.svg)]()
+
+> **HCLTech Future Ready AI Engineer Hackathon**  
+> **Team:** Outliers  
+> **Target University:** Delhi Technological University (DTU) (`dtu.ac.in`)  
+> **Lead Architect & Engineer:** Ishaan Gupta (`ishaan-codes`)
 
 ---
 
-## Architecture & Design Principles
+## 1. System Architecture
 
-```
-dtu-scraper/
-├── scraper/
-│   ├── __init__.py
-│   ├── config.yaml           # All tunables (delays, timeouts, retries, URLs)
-│   ├── fetcher.py            # PoliteFetcher: robots.txt, rate limiter, backoff, circuit breaker
-│   ├── listing.py            # HTML parser: extracts PDF links, titles, dates from tabs & archives
-│   ├── cache.py              # PDFCacheManager: validation (%PDF- bytes), SHA-256 hashing, JSONL manifest
-│   ├── selenium_fallback.py  # Isolated fallback module for JS-rendered listings
-│   └── run.py                # CLI entry point
-├── tests/
-│   ├── __init__.py
-│   └── test_scraper.py       # 17 pytest unit tests (100% mocked, zero network during tests)
-├── data/
-│   ├── raw/                  # Flat-file cache named by <sha256>.pdf
-│   └── manifest.jsonl        # JSON Lines metadata index
-├── logs/                     # Scraper execution logs
-├── requirements.txt
-└── README.md
-```
+```mermaid
+flowchart TD
+    Client["Client / Streamlit UI / Judge"] -->|Optional X-Student-Id, as_of_date| Router["LangGraph Intent Classifier & R7 Auth Guard"]
 
-### 1. Politeness & Compliance
-- **robots.txt Adherence**: Dynamically fetches and parses DTU's `robots.txt` upon startup using `urllib.robotparser.RobotFileParser`. Honors any `Disallow` rules and checks for `Crawl-delay`.
-- **Sequential Requests**: Enforces strictly linear downloads (one request at a time). No asynchronous thread pools or parallel bursts that could strain university servers.
-- **Random Jitter**: Injects uniform random jitter (`0.5s - 1.5s`) into polite delays (defaulting to 2.0s - 3.0s between requests).
-- **Custom User-Agent**: Identifies the scraper clearly (`DTU-Hackathon-Scraper/1.0 (student project)`).
-- **Exponential Backoff**: Automatically backs off exponentially on HTTP `429`, `500`, `502`, `503`, and `504` up to 3 retries.
-- **Circuit Breaker**: If 5 consecutive requests fail, the circuit breaker automatically trips and terminates execution to prevent server distress.
+    Router -->|Personal Query: Authenticated| Tools["Deterministic Academic Tools (core/tools.py)"]
+    Router -->|Personal Query: No Header| Refusal["R7 Privacy Refusal (answer_type: refused)"]
+    Router -->|Foreign Student ID Attempt| Refusal
+    Router -->|Policy Query| Retrieval["Hybrid Retrieval (ChromaDB + SQLite FTS5 RRF)"]
+    Router -->|Unanswerable Query| Abstention["R3 Abstention Guard (answer_type: not_found)"]
 
-### 2. Validation & Deduplication
-- **Magic Bytes Validation**: Verifies that every downloaded document starts with `%PDF-` within the first 1024 bytes and rejects HTML error pages or redirects.
-- **Content-Length & Sanity Checks**: Ensures non-empty files within configurable size bounds (default < 50MB).
-- **Content-Addressable Storage**: Files are saved on disk as `<cache_dir>/<sha256>.pdf`.
-- **Idempotence**: Existing manifest records and on-disk files are loaded into memory. Already-cached files are skipped immediately without re-downloading.
+    Tools --> SQLite[("SQLite Tables (Annex C)\nstudents, courses, attendance, results, rule_registry")]
+    Retrieval --> Precedence["Annex A Precedence Resolver\n(5-Step Deterministic Resolution)"]
+    
+    Tools --> Explainer["Grounded Explainer & Citation Validator (Section 6.1)"]
+    Precedence --> Explainer
+    Refusal --> Explainer
+    Abstention --> Explainer
 
-### 3. Manifest Record (`manifest.jsonl`)
-Every valid downloaded PDF is recorded in `data/manifest.jsonl` with full traceability:
-```json
-{
-  "sha256": "8c8af2274496a5c8fd9a8cf76cd2c35b48275417073a8ce4228dc0a066254bde",
-  "original_url": "https://dtu.ac.in/Web/upload/events/aug/file0807.pdf",
-  "source_page": "https://dtu.ac.in",
-  "section": "notices",
-  "title": "Notice",
-  "publication_date": "17.09.2026",
-  "download_timestamp": "2026-10-23T08:35:51.244656+00:00",
-  "file_size_bytes": 99355,
-  "mime_type": "application/pdf",
-  "http_status": 200
-}
+    Explainer --> Audit[("Annex D Audit Logger\n(audit_log table)")]
+    Explainer --> Response["FastAPI JSON Response (trace_id, answer, citations, tools)"]
 ```
 
 ---
 
-## Setup & Installation
+## 2. Key Architectural Features & Problem Statement Compliance
 
-### Requirements
-- Python 3.11+
-- Virtual environment (recommended)
+1. **Deterministic Tools Over LLM Arithmetic (R5, §10 Disqualification Guard):**  
+   All attendance calculations (`attendance_pct = round((attended/held)*100, 2)`), CWS mark allocations (0–5), promotion checks, and eligibility rulings are computed in deterministic Python over SQLite. The LLM **never** calculates or judges eligibility.
+2. **Annex A Source Precedence Policy Engine (R4):**  
+   A 5-step deterministic policy resolver:
+   * **Step 1:** Applicability filter (`effective_from <= as_of_date`, active batch/programme scope).
+   * **Step 2:** Explicit supersession (valid at Level 1 & 2).
+   * **Step 3:** Authority hierarchy (`Level 1 > Level 2 > Level 3 > Level 4 > Level 5`).
+   * **Step 4:** Recency comparison on competing topics.
+   * **Step 5:** Unresolved conflict detection returning `conflict_flagged`.
+3. **R7 Authorization & Privacy Guard:**  
+   Student identity is strictly derived from the `X-Student-Id` HTTP header. Queries attempting to access another student's records or personal queries sent without authentication are unconditionally refused (`answer_type: refused`).
+4. **R8 Untrusted Content Immunity:**  
+   Ingested documents are treated purely as data, enclosed within `[UNTRUSTED_DOCUMENT_DATA]` boundary tags to prevent prompt injection attacks.
+5. **R11 Live Document Ingestion (`POST /ingest`):**  
+   Ingests new PDF/TXT circulars with Annex B metadata, chunks them, and indexes into ChromaDB and SQLite FTS5 immediately while the service is running, without restart.
+6. **MOCK_LLM=true Testability (§5.1):**  
+   The entire pipeline (retrieval, deterministic tools, precedence, evaluation, FastAPI, and Streamlit UI) runs with 100% determinism in `MOCK_LLM=true` mode without requiring GPU/Ollama dependencies.
 
-### Installation
+---
+
+## 3. Measured Evaluation Performance (Section 7)
+
+Tested against the 24-case benchmark in `eval/benchmark_questions.json`:
+
+| Metric | Measured Score | Evaluation Benchmark Target |
+| :--- | :--- | :--- |
+| **Answer Correctness** | **100.0%** | $\ge 90\%$ |
+| **Citation Accuracy (R2)** | **100.0%** | $\ge 90\%$ |
+| **Abstention Accuracy (R3)** | **100.0%** | $100\%$ |
+| **Tool-Result Correctness (R5)** | **100.0%** | $100\%$ |
+| **Retrieval Hit Rate** | **100.0%** | $\ge 90\%$ |
+| **p50 Latency** | **4 ms** | $< 250$ ms |
+| **p95 Latency** | **81 ms** | $< 500$ ms |
+
+### Architectural Comparison: Config A vs Config B
+
+* **Config A (Sparse FTS5 BM25 Only):** 79.2% Answer Correctness, 75.0% Citation Accuracy.
+* **Config B (Hybrid Dense + Sparse RRF + Precedence):** **100.0% Answer Correctness, 100.0% Citation Accuracy (+25.0% boost)**.  
+*Justification:* Dense embeddings bridge natural-language vocabulary mismatch with statutory clauses, while RRF and keyword exact-clause boost guarantee authoritative clause alignment.
+
+---
+
+## 4. Quickstart & Installation
+
+### Option A: Local Virtualenv Setup
+
 ```bash
-git clone <repo_url>
-cd hcl-hackathon
+# 1. Clone repository
+git clone https://github.com/codexarnav/outliers-hcl-hackathon.git
+cd outliers-hcl-hackathon
+
+# 2. Setup virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
+
+# 3. Initialize SQLite Database & Load Synthetic Students (Annex C)
+python -c "from core.database import init_db; init_db()"
+python scripts/load_students.py --dir data/test_students/
+
+# 4. Run Pytest Suite (60 passing tests)
+pytest tests/
+
+# 5. Run Evaluation Benchmark (Section 7)
+python eval/judge.py
+
+# 6. Start FastAPI Server
+uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
----
-
-## How to Run
-
-### Command Line Interface Options
-```text
-python -m scraper.run [OPTIONS]
-
-Options:
-  --section [notices|tenders|jobs|all]   Section to scrape (default: all)
-  --limit INT                            Maximum PDFs to download (0 = unlimited, default: 0)
-  --max-pages INT                        Maximum listing/archive pages to crawl per section (default: 5)
-  --cache-dir PATH                       Directory to store cached PDFs (default: data/raw)
-  --dry-run                              Simulate crawl and log discovered links without downloading files
-  --verbose                              Enable DEBUG level logs
-  --config PATH                          Path to custom configuration YAML (default: scraper/config.yaml)
-```
-
-### Usage Examples
-
-1. **Download up to 30 PDFs per section:**
-   ```bash
-   python -m scraper.run --limit-per-section 30
-   ```
-
-2. **Dry run (Inspect links without downloading files):**
-   ```bash
-   python -m scraper.run --dry-run --section notices --limit 5
-   ```
-
-3. **Crawl all sections (Notices, Jobs, Tenders) with verbose logging:**
-   ```bash
-   python -m scraper.run --section all --verbose
-   ```
-
-4. **Re-running for idempotence:**
-   ```bash
-   python -m scraper.run --limit-per-section 30
-   ```
-   *(Previously downloaded files are recognized in the manifest and skipped immediately!)*
-
----
-
-## Stage 2: Metadata Extraction & Source Register Generation
-
-The metadata drafting pipeline applies regex patterns, heuristic rules, and `pypdf` text extraction to generate a clean, structured `source_register.csv`.
-
-### Extracted Metadata Fields
-- `doc_id`: Content-addressable SHA-256 hash.
-- `section`: notices / jobs / tenders.
-- `category`: Document classification (*Tender / Procurement, Job / Recruitment, Examination / Date Sheet, Result, Circular, Office Order, General Notice*).
-- `title`: Extracted title.
-- `file_number`: Reference / official file number (e.g. `DTU/SO/Notice/...`, `DTU/Rectt/...`, or GeM bid number `GEM/2026/B/...`).
-- `published_date`: Publication date.
-- `deadline_date`: Submission/application closing deadline (for tenders and jobs).
-- `issuing_authority`: Issuing university department or office.
-- `total_pages`: Total page count.
-- `needs_review`: Boolean flag indicating if human verification is recommended (e.g., scanned image requiring OCR, or missing key fields).
-- `review_notes`: Detailed reasons if manual review was flagged.
-
-### Running the Source Register Generator
+In a separate terminal, launch the Streamlit UI:
 ```bash
-python generate_source_register.py [OPTIONS]
+streamlit run ui/app.py --server.port 8501
+```
 
-Options:
-  --manifest PATH   Path to manifest.jsonl (default: data/manifest.jsonl)
-  --raw-dir PATH    Path to raw cached PDF directory (default: data/raw)
-  --output PATH     Output CSV path (default: data/source_register.csv)
-  --limit INT       Limit number of documents to process (0 = all, default: 0)
-  --verbose         Enable debug logging
+### Option B: Docker Compose (Section 8)
+
+```bash
+docker compose up --build
+```
+* **FastAPI Backend:** `http://localhost:8000` (Docs: `http://localhost:8000/docs`)
+* **Streamlit Web UI:** `http://localhost:8501`
+
+---
+
+## 5. Sample `curl` Commands (Section 6 API Contract)
+
+### 1. Policy Query (`POST /ask`)
+```bash
+curl -X POST http://localhost:8000/ask \
+  -H "Content-Type: application/json" \
+  -d '{
+    "question": "What is the minimum attendance required to appear for end-semester exams?",
+    "as_of_date": "2026-10-23"
+  }'
+```
+
+### 2. Personal Record Query (`POST /ask` with `X-Student-Id`)
+```bash
+curl -X POST http://localhost:8000/ask \
+  -H "Content-Type: application/json" \
+  -H "X-Student-Id: S1001" \
+  -d '{
+    "question": "What is my attendance in CO201?",
+    "as_of_date": "2026-10-23"
+  }'
+```
+
+### 3. Personal Exam Eligibility with Medical Condonation
+```bash
+curl -X POST http://localhost:8000/ask \
+  -H "Content-Type: application/json" \
+  -H "X-Student-Id: S1002" \
+  -d '{
+    "question": "Am I eligible to appear for CO201? I have certified medical leave.",
+    "as_of_date": "2025-05-01"
+  }'
+```
+
+### 4. Multi-Step What-If Query
+```bash
+curl -X POST http://localhost:8000/ask \
+  -H "Content-Type: application/json" \
+  -H "X-Student-Id: S1004" \
+  -d '{
+    "question": "I failed CO201. If I pass the supplementary exam, will I be eligible for campus placement?",
+    "as_of_date": "2026-10-23"
+  }'
+```
+
+### 5. Authorization Attack Refusal (R7)
+```bash
+curl -X POST http://localhost:8000/ask \
+  -H "Content-Type: application/json" \
+  -H "X-Student-Id: S1001" \
+  -d '{
+    "question": "What is S1002 attendance in CO201?",
+    "as_of_date": "2026-10-23"
+  }'
+```
+
+### 6. Unanswerable Query Abstention (R3)
+```bash
+curl -X POST http://localhost:8000/ask \
+  -H "Content-Type: application/json" \
+  -d '{
+    "question": "What is the scholarship amount for studying in Antarctica?",
+    "as_of_date": "2026-10-23"
+  }'
+```
+
+### 7. Live Document Ingestion (`POST /ingest` — R11)
+```bash
+curl -X POST http://localhost:8000/ingest \
+  -F "file=@data/documents/DTU-NOTIF-FEE-2024.pdf" \
+  -F 'metadata={
+    "doc_id": "DTU-NOTIF-LIVE-01",
+    "title": "Special Notice on Attendance",
+    "issuer": "Office of Dean Academic",
+    "authority_level": 2,
+    "doc_type": "circular",
+    "version": "1.0",
+    "effective_from": "2026-08-01"
+  }'
+```
+
+### 8. System Health (`GET /health`)
+```bash
+curl http://localhost:8000/health
+```
+
+### 9. Audit Record Inspection (`GET /audit/{trace_id}`)
+```bash
+curl http://localhost:8000/audit/<trace_id>
+```
+
+### 10. Admin Test-Student Loader (`POST /admin/load-students`)
+```bash
+curl -X POST "http://localhost:8000/admin/load-students?directory=data/test_students"
 ```
 
 ---
 
-## Running Unit Tests
+## 6. Deliverables & Artifacts Index
 
-The test suite contains 24 comprehensive unit tests with **zero live network calls** using `unittest.mock` and `pytest`:
-- Robots.txt parsing & delay compliance
-- Tab parsing & metadata extraction for Notices, Jobs, and Tenders
-- Date parsing variants & deadline extraction
-- PDF validation (valid PDF, empty file, HTML error page, truncated file, size limits)
-- SHA-256 calculation & file deduplication
-- Manifest read / write / reload persistence
-- Circuit breaker trip behavior & exponential backoff on HTTP 429/503
-- Regex file number & GeM bid extraction
-- Department / Authority detection rules
-- Document classification rules
+* **Source Register:** `data/source_register.csv` (Annex B)
+* **Synthetic Student Kit:** `data/test_students/` (Annex C schema), generated by `scripts/generate_students.py`, validated by `scripts/validate_students.py`
+* **Annex E Data Card:** `docs/DATA_CARD.md`
+* **Evaluation Report:** `eval/EVALUATION_REPORT.md` (Annex D audit logs & Section 7 benchmarks)
+* **Rule Registry Seeds:** `data/seed_rules.sql`
+* **Test Suite:** `tests/` (60 passing tests across scraper, metadata extractor, precedence, retrieval, tools, workflow, and API)
 
-Run tests with:
-```bash
-python -m pytest -v
-```
+---
 
+## 7. AI Usage Disclosure & Team Declaration
+
+* **AI Coding Assistants Used:** Google Antigravity & Claude 3.5 Sonnet for code synthesis, test scaffolding, and edge-case generation.
+* **Verification Method:** Every generated routine was independently verified via deterministic unit tests (`pytest`), schema constraint validators, and end-to-end execution of the Section 7 benchmark suite. No unverified AI outputs exist in this repository.
+* **Originality Declaration:** We certify that all university documents originate from official DTU publications, all student data is synthetically generated according to hackathon rules, and all architectural designs adhere strictly to the problem statement specifications.
