@@ -15,8 +15,8 @@
 | **Abstention Accuracy (R3)** | **100.0%** | $100\%$ | **PASS** |
 | **Tool-Result Correctness (R5)** | **100.0%** | $100\%$ | **PASS** |
 | **Retrieval Hit Rate** | **100.0%** | $\ge 90\%$ | **PASS** |
-| **p50 Latency** | **6 ms** | $< 250$ ms | **PASS** |
-| **p95 Latency** | **88 ms** | $< 500$ ms | **PASS** |
+| **p50 Latency** | **5 ms** | $< 250$ ms | **PASS** |
+| **p95 Latency** | **79 ms** | $< 500$ ms | **PASS** |
 
 ---
 
@@ -30,7 +30,7 @@ To satisfy the Section 7 requirement for rigorous engineering comparison, we eva
 | **Citation Accuracy** | 75.0% | **100.0%** | **+25.0%** |
 | **Retrieval Hit Rate** | 100.0% | **100.0%** | **+0.0%** |
 | **Abstention Accuracy** | 83.3% | **100.0%** | +16.7% |
-| **p50 Latency** | 1 ms | 6 ms | +5 ms |
+| **p50 Latency** | 1 ms | 5 ms | +4 ms |
 
 ### Architectural Justification for Config B
 Config B outperforms pure sparse BM25 significantly in both Citation Accuracy and Retrieval Hit Rate. While pure sparse BM25 is fast, it fails on vocabulary mismatch (e.g. natural language queries like *"What is the medical condonation relaxation limit?"* versus ordinance text *"Clause R.1(B).22(iii) Attendance Relaxation"*), and completely lacks the Annex A multi-stage precedence engine necessary to resolve explicit amendments and supersessions. Hybrid RRF combines dense semantic similarity (ChromaDB with `BAAI/bge-small-en-v1.5`) with exact clause keyword matching, guaranteeing both high recall and high precision.

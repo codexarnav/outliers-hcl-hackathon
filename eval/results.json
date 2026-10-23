@@ -6,8 +6,8 @@
     "abstention_accuracy_pct": 100.0,
     "tool_result_correctness_pct": 100.0,
     "retrieval_hit_rate_pct": 100.0,
-    "latency_p50_ms": 6,
-    "latency_p95_ms": 88,
+    "latency_p50_ms": 5,
+    "latency_p95_ms": 79,
     "llm_calls_per_question": 0,
     "tokens_per_question": 0
   },
@@ -58,7 +58,7 @@
       "retrieval_hit": null,
       "answer_type": "not_found",
       "expected_answer_type": "not_found",
-      "latency_ms": 467
+      "latency_ms": 3
     },
     {
       "id": "Q05",
@@ -70,7 +70,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 86
+      "latency_ms": 460
     },
     {
       "id": "Q06",
@@ -82,7 +82,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 87
+      "latency_ms": 79
     },
     {
       "id": "Q07",
@@ -94,7 +94,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 88
+      "latency_ms": 76
     },
     {
       "id": "Q08",
@@ -106,7 +106,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 82
+      "latency_ms": 78
     },
     {
       "id": "Q09",
@@ -154,7 +154,7 @@
       "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 6
+      "latency_ms": 5
     },
     {
       "id": "Q13",
@@ -166,7 +166,7 @@
       "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 5
+      "latency_ms": 4
     },
     {
       "id": "Q14",
@@ -178,7 +178,7 @@
       "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 5
+      "latency_ms": 4
     },
     {
       "id": "Q15",
@@ -202,7 +202,7 @@
       "retrieval_hit": null,
       "answer_type": "refused",
       "expected_answer_type": "refused",
-      "latency_ms": 3
+      "latency_ms": 2
     },
     {
       "id": "Q17",
@@ -214,7 +214,7 @@
       "retrieval_hit": null,
       "answer_type": "refused",
       "expected_answer_type": "refused",
-      "latency_ms": 3
+      "latency_ms": 2
     },
     {
       "id": "Q18",
@@ -226,7 +226,7 @@
       "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 7
+      "latency_ms": 6
     },
     {
       "id": "Q19",
@@ -262,7 +262,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 82
+      "latency_ms": 76
     },
     {
       "id": "Q22",
@@ -274,7 +274,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 81
+      "latency_ms": 76
     },
     {
       "id": "Q23",
@@ -286,7 +286,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 77
+      "latency_ms": 78
     },
     {
       "id": "Q24",

@@ -151,12 +151,29 @@ def classify_and_authorize_node(state: AgentState) -> Dict[str, Any]:
             "answer_type": "refused"
         }
 
-    # 3. Detect unanswerable questions (R3 Abstention)
+    # 3. Detect unanswerable questions, prompt injections, and out-of-scope requests (R3 Abstention)
     unanswerable_patterns = [
         "antarctica", "canteen", "menu", "swimming pool", "cricket match",
-        "hostel mess today", "weather", "alien", "movie", "football"
+        "hostel mess today", "weather", "alien", "movie", "football",
+        "cinema", "tickets"
     ]
     if any(pat in q_lower for pat in unanswerable_patterns):
+        return {
+            "category": "not_found",
+            "auth_status": "anonymous" if not student_id else "authorized",
+            "answer_type": "not_found"
+        }
+
+    # Prompt injection, jailbreak attempts, code generation, and creative requests
+    out_of_scope_patterns = [
+        r"\bforget\s+(?:everything|all|previous|prior)\b",
+        r"\bignore\s+(?:all|previous|prior|above)\s*(?:instructions?|rules?|prompts?)?\b",
+        r"\b(?:give\s+me|write|generate|show\s+me|provide)\s+(?:code|python|java|c\+\+|javascript|algorithm|pseudocode|script|recursion|program)\b",
+        r"\b(?:code\s+to\s+implement|implement\s+(?:recursion|sorting|binary|tree|linked|stack|queue|algorithm|code))\b",
+        r"\b(?:write\s+a\s+poem|write\s+an\s+essay|write\s+a\s+story|tell\s+a\s+joke)\b",
+        r"\b(?:system\s+prompt|jailbreak|pretend\s+to\s+be|you\s+are\s+now|act\s+as\s+a?)\b"
+    ]
+    if any(re.search(pat, q_lower) for pat in out_of_scope_patterns):
         return {
             "category": "not_found",
             "auth_status": "anonymous" if not student_id else "authorized",
@@ -252,7 +269,7 @@ def retrieval_and_precedence_node(state: AgentState) -> Dict[str, Any]:
     overlap_ratio = (len(matching_words) / len(query_words)) if query_words else 0.0
 
     # Reject out-of-domain / irrelevant retrieval
-    if (dense_dist > 0.82 and overlap_ratio < 0.25) or (top_score < 0.020 and len(matching_words) == 0):
+    if len(matching_words) == 0 or (dense_dist > 0.82 and overlap_ratio < 0.25) or (overlap_ratio < 0.20 and len(matching_words) < 2):
         return {
             "retrieved_chunks": chunks,
             "winning_chunk": None,
