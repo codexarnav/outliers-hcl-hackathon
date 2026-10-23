@@ -1,0 +1,205 @@
+"""
+Section-Aware Document Chunker
+Extracts structured chunks with clause headers, tables, and Annex B metadata.
+"""
+
+import os
+import re
+import csv
+from pathlib import Path
+from typing import List, Dict, Any
+from pypdf import PdfReader
+
+CLAUSE_PATTERN = re.compile(
+    r'(R\.\s*1\([A-Z]\)\.\d+[^:\n]*:|Section\s+\d+[^:\n]*:|Q\d+:[^\n]*|TABLE\s+\d+:[^\n]*|Clause\s+\d+[^:\n]*:)',
+    re.IGNORECASE
+)
+
+def load_source_register(register_path: Path) -> Dict[str, Dict[str, Any]]:
+    docs = {}
+    if not register_path.exists():
+        return docs
+    with open(register_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            docs[row["doc_id"]] = row
+    return docs
+
+def chunk_pdf(file_path: Path, doc_metadata: Dict[str, Any]) -> List[Dict[str, Any]]:
+    reader = PdfReader(str(file_path))
+    chunks = []
+    doc_id = doc_metadata.get("doc_id", file_path.stem)
+
+    for page_idx, page in enumerate(reader.pages):
+        text = page.extract_text() or ""
+        text = text.strip()
+        if not text:
+            continue
+
+        page_num = page_idx + 1
+
+        # Check for clauses in page text
+        split_points = [m.start() for m in CLAUSE_PATTERN.finditer(text)]
+
+        if not split_points or len(split_points) == 1:
+            # Single section on this page or standard paragraph
+            # Extract section name if present
+            first_match = CLAUSE_PATTERN.search(text)
+            section_name = first_match.group(0).strip(":") if first_match else f"Page {page_num}"
+            chunk_id = f"{doc_id}_P{page_num}_0"
+            chunks.append({
+                "chunk_id": chunk_id,
+                "doc_id": doc_id,
+                "title": doc_metadata.get("title", ""),
+                "section": section_name,
+                "page": page_num,
+                "text": text,
+                "authority_level": int(doc_metadata.get("authority_level", 1)),
+                "version": doc_metadata.get("version", "1.0"),
+                "effective_from": doc_metadata.get("effective_from", "2024-07-01"),
+                "effective_to": doc_metadata.get("effective_to", ""),
+                "supersedes": doc_metadata.get("supersedes", ""),
+                "scope_programmes": doc_metadata.get("scope_programmes", "ALL"),
+                "scope_batches": doc_metadata.get("scope_batches", "ALL"),
+                "provenance": doc_metadata.get("provenance", ""),
+            })
+        else:
+            # Multiple clauses on one page -> split into clause chunks
+            for idx in range(len(split_points)):
+                start = split_points[idx]
+                end = split_points[idx + 1] if idx + 1 < len(split_points) else len(text)
+                section_text = text[start:end].strip()
+
+                m = CLAUSE_PATTERN.search(section_text)
+                section_name = m.group(0).strip(":") if m else f"Page {page_num} Sec {idx+1}"
+
+                chunk_id = f"{doc_id}_P{page_num}_{idx}"
+                chunks.append({
+                    "chunk_id": chunk_id,
+                    "doc_id": doc_id,
+                    "title": doc_metadata.get("title", ""),
+                    "section": section_name,
+                    "page": page_num,
+                    "text": section_text,
+                    "authority_level": int(doc_metadata.get("authority_level", 1)),
+                    "version": doc_metadata.get("version", "1.0"),
+                    "effective_from": doc_metadata.get("effective_from", "2024-07-01"),
+                    "effective_to": doc_metadata.get("effective_to", ""),
+                    "supersedes": doc_metadata.get("supersedes", ""),
+                    "scope_programmes": doc_metadata.get("scope_programmes", "ALL"),
+                    "scope_batches": doc_metadata.get("scope_batches", "ALL"),
+                    "provenance": doc_metadata.get("provenance", ""),
+                })
+
+    return chunks
+
+def chunk_text_file(file_path: Path, doc_metadata: Dict[str, Any]) -> List[Dict[str, Any]]:
+    with open(file_path, "r", encoding="utf-8") as f:
+        full_text = f.read()
+
+    doc_id = doc_metadata.get("doc_id", file_path.stem)
+    matches = list(CLAUSE_PATTERN.finditer(full_text))
+    chunks = []
+
+    if not matches:
+        chunks.append({
+            "chunk_id": f"{doc_id}_0",
+            "doc_id": doc_id,
+            "title": doc_metadata.get("title", ""),
+            "section": "General",
+            "page": 1,
+            "text": full_text.strip(),
+            "authority_level": int(doc_metadata.get("authority_level", 1)),
+            "version": doc_metadata.get("version", "1.0"),
+            "effective_from": doc_metadata.get("effective_from", "2024-07-01"),
+            "effective_to": doc_metadata.get("effective_to", ""),
+            "supersedes": doc_metadata.get("supersedes", ""),
+            "scope_programmes": doc_metadata.get("scope_programmes", "ALL"),
+            "scope_batches": doc_metadata.get("scope_batches", "ALL"),
+            "provenance": doc_metadata.get("provenance", ""),
+        })
+        return chunks
+
+    for idx, match in enumerate(matches):
+        start = match.start()
+        end = matches[idx + 1].start() if idx + 1 < len(matches) else len(full_text)
+        clause_text = full_text[start:end].strip()
+        section_name = match.group(0).strip(":")
+
+        chunks.append({
+            "chunk_id": f"{doc_id}_C{idx+1}",
+            "doc_id": doc_id,
+            "title": doc_metadata.get("title", ""),
+            "section": section_name,
+            "page": max(1, (idx // 2) + 1),
+            "text": clause_text,
+            "authority_level": int(doc_metadata.get("authority_level", 1)),
+            "version": doc_metadata.get("version", "1.0"),
+            "effective_from": doc_metadata.get("effective_from", "2024-07-01"),
+            "effective_to": doc_metadata.get("effective_to", ""),
+            "supersedes": doc_metadata.get("supersedes", ""),
+            "scope_programmes": doc_metadata.get("scope_programmes", "ALL"),
+            "scope_batches": doc_metadata.get("scope_batches", "ALL"),
+            "provenance": doc_metadata.get("provenance", ""),
+        })
+
+    return chunks
+
+def chunk_all_documents(docs_dir: Path, register_path: Path) -> List[Dict[str, Any]]:
+    register = load_source_register(register_path)
+    all_chunks = []
+
+    # Priority to text transcriptions if available, otherwise PDF
+    processed_doc_ids = set()
+
+    # 1. Process text companions (e.g. DTU-ORD-2024.txt)
+    for file_name in os.listdir(docs_dir):
+        if file_name.endswith(".txt"):
+            file_path = docs_dir / file_name
+            doc_id = file_path.stem
+            meta = register.get(doc_id, {
+                "doc_id": doc_id,
+                "title": file_name,
+                "authority_level": 1,
+                "version": "1.0",
+                "effective_from": "2024-07-01",
+                "effective_to": "",
+                "supersedes": "",
+                "scope_programmes": "ALL",
+                "scope_batches": "ALL",
+            })
+            chunks = chunk_text_file(file_path, meta)
+            all_chunks.extend(chunks)
+            processed_doc_ids.add(doc_id)
+            print(f"[OK] Chunked {file_name}: {len(chunks)} clause chunks extracted.")
+
+    # 2. Process PDFs (excluding already processed via text)
+    for file_name in os.listdir(docs_dir):
+        if not file_name.endswith(".pdf"):
+            continue
+        file_path = docs_dir / file_name
+        doc_id = file_path.stem
+        if doc_id in processed_doc_ids:
+            continue
+        meta = register.get(doc_id, {
+            "doc_id": doc_id,
+            "title": file_name,
+            "authority_level": 2,
+            "version": "1.0",
+            "effective_from": "2024-07-01",
+            "effective_to": "",
+            "supersedes": "",
+            "scope_programmes": "ALL",
+            "scope_batches": "ALL",
+        })
+        chunks = chunk_pdf(file_path, meta)
+        all_chunks.extend(chunks)
+        print(f"[OK] Chunked {file_name}: {len(chunks)} chunks extracted.")
+
+    return all_chunks
+
+if __name__ == "__main__":
+    docs_dir = Path("data/documents")
+    reg_path = Path("data/source_register.csv")
+    chunks = chunk_all_documents(docs_dir, reg_path)
+    print(f"Total chunks extracted across corpus: {len(chunks)}")
