@@ -82,15 +82,18 @@ def is_clause_match(target_sec: str, chunk_sec: str) -> bool:
 
     return bool(t_clean and t_clean == c_clean)
 
-def is_scope_applicable(doc_scope: str, student_val: str) -> bool:
+def is_scope_applicable(doc_scope: str, student_val: str, as_of_date: Optional[str] = None) -> bool:
     """
     Checks if student's programme or batch matches document scope.
     If student_val is 'ALL' (general query not specific to one student),
-    general university policies remain applicable.
+    general university policies remain applicable, but historical past cohorts
+    (e.g. 2021,2022,2023) do not apply to general queries when as_of_date is in 2024+.
     """
     if not doc_scope or doc_scope.strip().upper() == "ALL":
         return True
     if not student_val or student_val.strip().upper() == "ALL":
+        if as_of_date and as_of_date >= "2024-07-01" and ("+" not in doc_scope):
+            return False
         return True
 
     allowed = [s.strip().lower() for s in doc_scope.split(",")]
@@ -197,7 +200,7 @@ def resolve_precedence(
         b_scope = c.get("scope_batches", "ALL")
 
         p_match = is_scope_applicable(p_scope, programme or "ALL")
-        b_match = is_scope_applicable(b_scope, batch_year or "ALL")
+        b_match = is_scope_applicable(b_scope, batch_year or "ALL", as_of_date=as_of_date)
 
         if not (p_match and b_match):
             excluded_scope.append(c)
