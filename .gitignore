@@ -36,6 +36,11 @@ ENV/
 data/chromadb/
 data/app.db
 
+# Scraper cache & logs
+logs/*.log
+data/raw/*.pdf
+!data/raw/.gitkeep
+
 # Large binaries / raw cache (downloaded on demand via scripts/scrape_dtu.py)
 data/documents/BTech_2025_ordinance.pdf
 
