@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     PORT: int = 8000
     LOG_LEVEL: str = "INFO"
 
+    # Admin authorization (R7 & Section 4.2 / Section 6 security)
+    ADMIN_API_KEY: str = "judge-secret-key"
+
     # Operational Mode (Section 5.1 practical tip)
     MOCK_LLM: bool = True
 
@@ -34,8 +37,6 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
 
-    class Config:
-        env_file = ".env"
-        extra = "allow"
+    model_config = {"env_file": ".env", "extra": "allow"}
 
 settings = Settings()

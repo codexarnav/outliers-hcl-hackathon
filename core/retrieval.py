@@ -5,6 +5,7 @@ Reciprocal Rank Fusion (RRF), and applies Cross-Encoder reranking (Annex B & PS 
 """
 
 import os
+import re
 import sys
 import sqlite3
 from pathlib import Path
@@ -84,7 +85,33 @@ def init_fts_table(conn: sqlite3.Connection):
         );
         """)
 
-def index_chunks(chunks: List[Dict[str, Any]]):
+def delete_document_chunks(doc_id: str) -> None:
+    """
+    Deletes all chunks for a given doc_id from both SQLite FTS5 and ChromaDB (Finding #19).
+    Prevents orphaned clauses when documents are replaced or updated.
+    """
+    if not doc_id:
+        return
+
+    # Delete from SQLite FTS5
+    conn = get_connection()
+    try:
+        init_fts_table(conn)
+        with conn:
+            conn.execute("DELETE FROM chunks_fts WHERE doc_id = ?", (doc_id,))
+    except Exception as e:
+        print(f"[WARN] Failed to delete FTS5 chunks for doc_id '{doc_id}': {e}")
+    finally:
+        conn.close()
+
+    # Delete from ChromaDB
+    try:
+        col = get_chroma_collection()
+        col.delete(where={"doc_id": doc_id})
+    except Exception as e:
+        print(f"[WARN] Failed to delete Chroma chunks for doc_id '{doc_id}': {e}")
+
+def index_chunks(chunks: List[Dict[str, Any]]) -> int:
     if not chunks:
         return 0
 
@@ -220,7 +247,8 @@ def search_dense(query: str, top_k: int = 10) -> List[Dict[str, Any]]:
             "scope_programmes": meta.get("scope_programmes", "ALL"),
             "scope_batches": meta.get("scope_batches", "ALL"),
             "provenance": meta.get("provenance", ""),
-            "distance": dist
+            "distance": dist,
+            "dense_distance": dist
         })
 
     return chunks
@@ -243,18 +271,22 @@ def rerank_candidates(query: str, candidates: List[Dict[str, Any]], top_k: int =
 
     # Heuristic scoring fallback for MOCK_LLM or offline environments
     q_lower = query.lower()
+    query_words = set(re.findall(r'\b[a-zA-Z]{3,}\b', q_lower)) - {
+        "what", "which", "when", "where", "about", "under", "shall", "student", "university", "the", "for", "with"
+    }
+
     for item in candidates:
         text_lower = item["text"].lower()
         score = item.get("score", 0.0)
 
+        # Overlap boost based on specific query terms
+        matching_words = sum(1 for w in query_words if w in text_lower)
+        score += matching_words * 0.01
+
         # Boost for exact clause citations
-        for term in ["r.1(b).22", "attendance", "supplementary", "cws", "fee", "make-up", "fail"]:
+        for term in ["r.1(b).22", "supplementary", "cws", "make-up"]:
             if term in q_lower and term in text_lower:
                 score += 0.05
-        
-        # Boost for primary regulation level
-        if item.get("authority_level") == 1:
-            score += 0.01
 
         item["score"] = round(score, 4)
 

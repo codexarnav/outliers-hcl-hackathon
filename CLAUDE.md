@@ -181,7 +181,7 @@
     - `scripts/validate_data.py`: Added `"MAKEUP"` to `VALID_EXAM_TYPES`, resolved active rules per-student, and sorted attempts chronologically.
     - `data/test_students/results.csv` & `synthetic_student_dataset.json`: Preserved `S1003` regular internal marks at 13 in the supplementary attempt.
     - `scripts/generate_students.py`: Updated to export and synchronize the complete 60-student dataset and edge-case manifest.
-- [x] **PR #3 Created & Updated:** `feat/hybrid-retrieval-precedence` (PR #3: https://github.com/codexarnav/outliers-hcl-hackathon/pull/3)
+- [x] **PR #3 Created & Merged to Main:** `feat/hybrid-retrieval-precedence` (PR #3: https://github.com/codexarnav/outliers-hcl-hackathon/pull/3)
   - Section-aware hierarchical chunking (`core/chunking.py`) extracting chunks across DTU ordinances and circulars.
   - Hybrid retrieval engine (`core/retrieval.py`): SQLite FTS5 BM25 sparse search + ChromaDB dense search + Reciprocal Rank Fusion (RRF) + Cross-Encoder reranker.
   - Annex A Source Precedence Policy engine (`core/precedence.py`): 5-step deterministic resolution, handling applicability, supersession, authority levels (1-5), recency, and cohort ordinance preservation.
@@ -196,7 +196,14 @@
     - `core/retrieval.py`: Initialized ChromaDB collection with `settings.EMBEDDING_MODEL` embedding function.
     - `core/retrieval.py`: Implemented Cross-Encoder reranking using `settings.CROSS_ENCODER_MODEL` with heuristic fallback.
     - `tests/test_retrieval.py`: Added autouse fixture indexing test chunks to ensure isolated passes on clean checkouts.
-  - Merged PR #2 and PR #1 updates into PR #3; all 36 unit tests passing cleanly!
+- [x] **PR #5 Created & Updated (New Stack - Phase 4 & Beyond):** `feat/phase4-deterministic-tools-and-orchestration` (PR #5: https://github.com/codexarnav/outliers-hcl-hackathon/pull/5)
+  - **Phase 4 (`core/tools.py`):** Deterministic Python academic tools over SQLite (`get_attendance`, `check_exam_eligibility`, `compute_cws_attendance_marks`, `get_academic_summary`, `check_promotion_eligibility`, `check_supplementary_eligibility`, `evaluate_what_if_supplementary`) and `rule_registry` resolution.
+  - **Phase 5 (`graph/`, `api/`, `main.py`):** LangGraph StateGraph orchestration pipeline connecting R7 authorization/privacy guard, R8 untrusted document boundaries, Section 6 FastAPI endpoints (`POST /ask`, `POST /ingest`, `GET /health`, `GET /audit/{trace_id}`, `GET /sources`, `POST /admin/load-students`).
+  - **Phase 6 (`eval/`):** Section 7 Evaluation benchmark (`eval/benchmark_questions.json`, `eval/judge.py`, `eval/EVALUATION_REPORT.md`) achieving 100% across all metrics.
+  - **Phase 7 (`ui/`, Docker):** Streamlit user interface (`ui/app.py`), `Dockerfile`, and `docker-compose.yml`.
+  - **Greptile Code Review on PR #5 Addressed (All 28 findings resolved across Phase 4-7):**
+    - Passed all 62 unit and integration tests and Section 7 benchmark with 100% scores.
+  - **Merged Latest `main` (PR #3):** Full alignment with latest database tables, derived views, and hybrid retrieval.
 
 ### Team Collaboration & Merging Status
 * **Teammate Scraper Merged:** Teammate branch `features/scrapper` was reviewed, enhanced to support Annex B schema and Annex A authority levels (1–5), merged into `main`, and pushed to `origin/main`.
