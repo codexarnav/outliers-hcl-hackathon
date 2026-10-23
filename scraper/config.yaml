@@ -1,0 +1,71 @@
+# ─────────────────────────────────────────────────────────────
+# DTU PDF Scraper — Configuration
+# ─────────────────────────────────────────────────────────────
+
+base_url: "https://dtu.ac.in"
+
+# Section listing URLs (all are the homepage with different tab content)
+sections:
+  notices:
+    url: "https://dtu.ac.in"
+    tab_id: "tab1"
+    # CSS selector for the tab content pane containing notice entries
+    container_selector: "#tab1"
+    # Selector for individual list items inside the tab
+    item_selector: "li"
+    archive_url: "http://www.dtu.ac.in/Web/Archive/archive-notices.php"
+  jobs:
+    url: "https://dtu.ac.in"
+    tab_id: "tab2"
+    container_selector: "#tab2"
+    item_selector: "li"
+    archive_url: "http://www.dtu.ac.in/Web/Archive/archive-jobs.php"
+  tenders:
+    url: "https://dtu.ac.in"
+    tab_id: "tab3"
+    container_selector: "#tab3"
+    item_selector: "li"
+    archive_url: "http://www.dtu.ac.in/Web/Archive/archive-tenders.php"
+  academics:
+    url: "http://dtu.ac.in/Web/Academics/ordinance.php"
+    container_selector: "body"
+    item_selector: "a"
+    archive_url: "http://dtu.ac.in/Web/Academics/ordinance.php"
+
+# HTTP behaviour
+user_agent: "DTU-Hackathon-Scraper/1.0 (student project)"
+
+# Delay between page requests (seconds) — uniform random in [min, max]
+page_delay_min: 1.0
+page_delay_max: 3.0
+
+# Delay between PDF downloads (seconds)
+pdf_delay_min: 2.0
+pdf_delay_max: 3.0
+
+# Timeouts (seconds)
+connect_timeout: 10
+read_timeout: 30
+pdf_read_timeout: 60
+
+# Retry behaviour
+max_retries: 3            # retries per request (total attempts = max_retries + 1)
+backoff_base: 2.0         # exponential backoff base in seconds
+retry_status_codes:
+  - 429
+  - 500
+  - 502
+  - 503
+  - 504
+
+# Circuit breaker
+circuit_breaker_threshold: 5   # consecutive failures before aborting
+
+# Output paths (relative to project root)
+raw_dir: "data/raw"
+manifest_path: "data/manifest.jsonl"
+log_dir: "logs"
+
+# PDF URL patterns to match (any href containing these patterns is a candidate)
+pdf_url_patterns:
+  - ".pdf"
