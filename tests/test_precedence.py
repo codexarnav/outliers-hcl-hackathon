@@ -143,3 +143,77 @@ def test_unresolved_conflict_detection():
     res = resolve_precedence(test_chunks, as_of_date="2024-09-01")
     assert res["answer_type"] == "conflict_flagged"
     assert len(res["conflicts_detected"]) == 1
+
+def test_shared_numbers_conflicting_rules():
+    """Shared numbers (like Clause 1) do not hide contradictory thresholds (Comment 11)."""
+    test_chunks = [
+        {
+            "doc_id": "DTU-CIR-ATT-A",
+            "section": "Clause 1",
+            "authority_level": 2,
+            "effective_from": "2024-08-01",
+            "supersedes": "",
+            "text": "Clause 1: Minimum attendance is 75%."
+        },
+        {
+            "doc_id": "DTU-CIR-ATT-B",
+            "section": "Clause 1",
+            "authority_level": 2,
+            "effective_from": "2024-08-01",
+            "supersedes": "",
+            "text": "Clause 1: Minimum attendance is 80%."
+        }
+    ]
+    res = resolve_precedence(test_chunks, as_of_date="2024-09-01")
+    assert res["answer_type"] == "conflict_flagged"
+    assert len(res["conflicts_detected"]) == 1
+    assert res["conflicts_detected"][0]["doc_a"] == "DTU-CIR-ATT-A"
+    assert res["conflicts_detected"][0]["doc_b"] == "DTU-CIR-ATT-B"
+
+def test_clause_supersession_does_not_remove_unrelated_clauses():
+    """Target Clause R.1(B).1 must not remove R.1(B).10 or R.1(B).11 (Comment 12)."""
+    test_chunks = [
+        {
+            "doc_id": "DTU-ORD-2024",
+            "section": "Clause R.1(B).1: Preamble and Structure of B.Tech Programmes",
+            "authority_level": 1,
+            "effective_from": "2024-07-01",
+            "supersedes": "",
+            "text": "Old preamble rule."
+        },
+        {
+            "doc_id": "DTU-ORD-2024",
+            "section": "Clause R.1(B).10: Academic Registration and Advising",
+            "authority_level": 1,
+            "effective_from": "2024-07-01",
+            "supersedes": "",
+            "text": "Academic registration rule."
+        },
+        {
+            "doc_id": "DTU-ORD-2024",
+            "section": "Clause R.1(B).11: Course Registration and Credit Limits",
+            "authority_level": 1,
+            "effective_from": "2024-07-01",
+            "supersedes": "",
+            "text": "Credit limit rule."
+        },
+        {
+            "doc_id": "DTU-AMEND-PREAMBLE",
+            "section": "Section 1",
+            "authority_level": 2,
+            "effective_from": "2026-08-01",
+            "supersedes": "DTU-ORD-2024#Clause R.1(B).1",
+            "text": "New amended preamble rule."
+        }
+    ]
+    res = resolve_precedence(test_chunks, as_of_date="2026-10-23")
+    # Only Clause R.1(B).1 should be superseded
+    superseded_sections = [c["section"] for c in res["superseded_chunks"]]
+    assert any("R.1(B).1:" in s for s in superseded_sections)
+    assert not any("R.1(B).10" in s for s in superseded_sections)
+    assert not any("R.1(B).11" in s for s in superseded_sections)
+
+    # Surviving chunks must include R.1(B).10 and R.1(B).11
+    surviving_sections = [c["section"] for c in res["applicable_chunks"]]
+    assert any("R.1(B).10" in s for s in surviving_sections)
+    assert any("R.1(B).11" in s for s in surviving_sections)

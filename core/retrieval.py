@@ -88,11 +88,47 @@ def index_chunks(chunks: List[Dict[str, Any]]):
     if not chunks:
         return 0
 
+    # 1. Prepare replacements and validate metadatas first (Comment 13: avoid erasing search entries on failure)
+    doc_ids = list({c["doc_id"] for c in chunks if c.get("doc_id")})
+    ids = [c["chunk_id"] for c in chunks]
+    documents = [c["text"] for c in chunks]
+    metadatas = [{
+        "doc_id": c["doc_id"],
+        "title": c.get("title", ""),
+        "section": c.get("section", ""),
+        "page": int(c.get("page", 1)),
+        "authority_level": int(c.get("authority_level", 1)),
+        "effective_from": c.get("effective_from", ""),
+        "effective_to": c.get("effective_to", ""),
+        "supersedes": c.get("supersedes", ""),
+        "scope_programmes": c.get("scope_programmes", "ALL"),
+        "scope_batches": c.get("scope_batches", "ALL"),
+        "provenance": c.get("provenance", ""),
+    } for c in chunks]
+
+    # 2. Store replacements in ChromaDB first while keeping old entries intact
+    collection = get_chroma_collection()
+    collection.upsert(
+        ids=ids,
+        documents=documents,
+        metadatas=metadatas
+    )
+
+    # 3. Clean up obsolete chunks for shortened documents only after new chunks are safely stored
+    new_ids_set = set(ids)
+    for doc_id in doc_ids:
+        try:
+            existing = collection.get(where={"doc_id": doc_id})
+            if existing and existing.get("ids"):
+                obsolete_ids = [cid for cid in existing["ids"] if cid not in new_ids_set]
+                if obsolete_ids:
+                    collection.delete(ids=obsolete_ids)
+        except Exception:
+            pass
+
+    # 4. Atomic transaction in SQLite FTS5 only after dense storage succeeded
     conn = get_connection()
     init_fts_table(conn)
-
-    # 1. Index into SQLite FTS5 (purging obsolete chunks for replaced documents - Comment 6)
-    doc_ids = list({c["doc_id"] for c in chunks if c.get("doc_id")})
     with conn:
         for doc_id in doc_ids:
             conn.execute("DELETE FROM chunks_fts WHERE doc_id = ?", (doc_id,))
@@ -111,38 +147,7 @@ def index_chunks(chunks: List[Dict[str, Any]]):
                 c.get("supersedes", ""), c.get("scope_programmes", "ALL"),
                 c.get("scope_batches", "ALL")
             ))
-
     conn.close()
-
-    # 2. Index into ChromaDB
-    collection = get_chroma_collection()
-    for doc_id in doc_ids:
-        try:
-            collection.delete(where={"doc_id": doc_id})
-        except Exception:
-            pass
-
-    ids = [c["chunk_id"] for c in chunks]
-    documents = [c["text"] for c in chunks]
-    metadatas = [{
-        "doc_id": c["doc_id"],
-        "title": c.get("title", ""),
-        "section": c.get("section", ""),
-        "page": int(c.get("page", 1)),
-        "authority_level": int(c.get("authority_level", 1)),
-        "effective_from": c.get("effective_from", ""),
-        "effective_to": c.get("effective_to", ""),
-        "supersedes": c.get("supersedes", ""),
-        "scope_programmes": c.get("scope_programmes", "ALL"),
-        "scope_batches": c.get("scope_batches", "ALL"),
-        "provenance": c.get("provenance", ""),
-    } for c in chunks]
-
-    collection.upsert(
-        ids=ids,
-        documents=documents,
-        metadatas=metadatas
-    )
 
     return len(chunks)
 

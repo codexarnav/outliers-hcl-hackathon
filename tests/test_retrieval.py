@@ -90,3 +90,54 @@ def test_sparse_fts_fee_schedule():
     assert len(res) > 0
     doc_ids = [r["doc_id"] for r in res]
     assert "DTU-NOTIF-FEE-2024" in doc_ids or "DTU-ORD-2021" in doc_ids
+
+def test_index_chunks_atomic_replacement():
+    """Verify that index_chunks replaces entries without deleting existing chunks on preparation (Comment 13)."""
+    initial_chunks = [
+        {
+            "chunk_id": "TEST-DOC_P1_1",
+            "doc_id": "TEST-DOC",
+            "title": "Test Document",
+            "section": "Sec 1",
+            "page": 1,
+            "text": "Initial test chunk 1 about robotics scholarship.",
+            "authority_level": 2,
+            "effective_from": "2024-01-01"
+        },
+        {
+            "chunk_id": "TEST-DOC_P1_2",
+            "doc_id": "TEST-DOC",
+            "title": "Test Document",
+            "section": "Sec 2",
+            "page": 1,
+            "text": "Initial test chunk 2 about robotics laboratory.",
+            "authority_level": 2,
+            "effective_from": "2024-01-01"
+        }
+    ]
+    index_chunks(initial_chunks)
+
+    res = search_sparse("robotics scholarship", top_k=5)
+    assert any(r["chunk_id"] == "TEST-DOC_P1_1" for r in res)
+
+    # Re-index with only chunk 1 updated (shortened document)
+    updated_chunks = [
+        {
+            "chunk_id": "TEST-DOC_P1_1",
+            "doc_id": "TEST-DOC",
+            "title": "Test Document Updated",
+            "section": "Sec 1",
+            "page": 1,
+            "text": "Updated test chunk 1 about robotics fellowship.",
+            "authority_level": 2,
+            "effective_from": "2024-01-01"
+        }
+    ]
+    index_chunks(updated_chunks)
+
+    res_updated = search_sparse("robotics fellowship", top_k=5)
+    assert any(r["chunk_id"] == "TEST-DOC_P1_1" for r in res_updated)
+
+    # Obsolete chunk 2 should be gone from search
+    res_obsolete = search_sparse("robotics laboratory", top_k=5)
+    assert not any(r["chunk_id"] == "TEST-DOC_P1_2" for r in res_obsolete)

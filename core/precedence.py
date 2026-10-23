@@ -35,6 +35,53 @@ def normalize_section_ref(text: str) -> str:
             s = s[len(prefix):].strip()
     return s.replace(" ", "")
 
+def extract_clause_identifier(text: str) -> Optional[str]:
+    """
+    Extracts the canonical complete clause/section identifier.
+    E.g. 'Clause R.1(B).22: Attendance' -> 'r.1(b).22'
+         'Clause R.1(B).1' -> 'r.1(b).1'
+         'Section 4.1' -> '4.1'
+         'Clause 1' -> '1'
+    """
+    if not text:
+        return None
+    s = str(text).strip()
+    m = re.search(
+        r"(?:clause|section|sec\.?|rule)?\s*([a-zA-Z]\.\s*\d+(?:\([a-zA-Z0-9]+\))*\.\d+|\d+(?:\.\d+)*|[a-zA-Z]+\d+)",
+        s,
+        re.IGNORECASE
+    )
+    if m:
+        return re.sub(r"\s+", "", m.group(1)).lower()
+    return None
+
+def is_clause_match(target_sec: str, chunk_sec: str) -> bool:
+    """
+    Matches target clause reference with chunk section accurately.
+    Prevents prefix collisions like Clause R.1(B).1 matching R.1(B).10 (Comment 12).
+    Allows heading text only after a clear boundary (e.g. colon, dash).
+    """
+    if not target_sec:
+        # Whole document target supersedes all chunks of target doc
+        return True
+    if not chunk_sec:
+        return False
+
+    t_id = extract_clause_identifier(target_sec)
+    c_id = extract_clause_identifier(chunk_sec)
+
+    if t_id and c_id:
+        return t_id == c_id
+
+    # Fallback for non-standard section titles:
+    # Match complete section identifier before boundary (colon, dash, etc.)
+    t_base = re.split(r"[:\-\u2013\u2014]", target_sec, maxsplit=1)[0].strip().lower()
+    c_base = re.split(r"[:\-\u2013\u2014]", chunk_sec, maxsplit=1)[0].strip().lower()
+    t_clean = normalize_section_ref(t_base)
+    c_clean = normalize_section_ref(c_base)
+
+    return bool(t_clean and t_clean == c_clean)
+
 def is_scope_applicable(doc_scope: str, student_val: str) -> bool:
     """
     Checks if student's programme or batch matches document scope.
@@ -62,23 +109,53 @@ def is_scope_applicable(doc_scope: str, student_val: str) -> bool:
     return False
 
 def check_genuine_conflict(item_a: Dict[str, Any], item_b: Dict[str, Any]) -> bool:
-    """Checks whether two same-level, same-date candidate documents have conflicting claims."""
+    """
+    Checks whether two same-level, same-date candidate documents make incompatible claims.
+    Compares specific rule thresholds (percentages, CGPA, credits, marks, duration) and
+    opposing policy verdicts, rather than requiring all numbers to differ (Comment 11).
+    """
     text_a = item_a.get("text", "")
     text_b = item_b.get("text", "")
-
-    # Extract percentage and mark values
-    nums_a = set(re.findall(r"\b\d+(?:\.\d+)?%?\b", text_a))
-    nums_b = set(re.findall(r"\b\d+(?:\.\d+)?%?\b", text_b))
-
-    # If both cite numerical thresholds and they disagree completely on those numbers:
-    if nums_a and nums_b and not (nums_a & nums_b):
-        return True
-
-    # If both reference passing or eligibility with opposite verdicts:
     lower_a = text_a.lower()
     lower_b = text_b.lower()
-    if ("pass" in lower_a and "fail" in lower_b) or ("eligible" in lower_a and "detained" in lower_b):
+
+    # 1. Compare percentage thresholds (e.g. 75% vs 80% even when sharing clause numbers)
+    pcts_a = set(re.findall(r"\b\d+(?:\.\d+)?\s*%", text_a))
+    pcts_b = set(re.findall(r"\b\d+(?:\.\d+)?\s*%", text_b))
+    if pcts_a and pcts_b and pcts_a != pcts_b:
         return True
+
+    # 2. Compare metric-specific values (CGPA, credits, marks, days/duration, fees)
+    metrics = [
+        (r"\b(?:cgpa|sgpa|gpa)\s*(?:of|is|>=|<=|:)?\s*(\d+(?:\.\d+)?)", "gpa"),
+        (r"\b(\d+(?:\.\d+)?)\s*credits?\b", "credits"),
+        (r"\b(\d+(?:\.\d+)?)\s*marks?\b", "marks"),
+        (r"\b(\d+)\s*(?:days?|weeks?|months?|semesters?|years?)\b", "duration"),
+        (r"(?:rs\.?|inr|₹)\s*(\d+(?:,\d+)*(?:\.\d+)?)", "fees"),
+    ]
+    for pattern, _ in metrics:
+        vals_a = set(re.findall(pattern, lower_a))
+        vals_b = set(re.findall(pattern, lower_b))
+        if vals_a and vals_b and vals_a != vals_b:
+            return True
+
+    # 3. Strip clause/section headers and compare substantive numerical thresholds
+    clean_a = re.sub(r"\b(?:clause|section|sec\.?|rule|table|q)\s*[0-9a-zA-Z\.\(\)\-]+", "", text_a, flags=re.I)
+    clean_b = re.sub(r"\b(?:clause|section|sec\.?|rule|table|q)\s*[0-9a-zA-Z\.\(\)\-]+", "", text_b, flags=re.I)
+    body_nums_a = set(re.findall(r"\b\d+(?:\.\d+)?%?\b", clean_a))
+    body_nums_b = set(re.findall(r"\b\d+(?:\.\d+)?%?\b", clean_b))
+    if body_nums_a and body_nums_b:
+        if (body_nums_a - body_nums_b) and (body_nums_b - body_nums_a):
+            return True
+
+    # 4. Check for opposing regulatory verdicts
+    pos_terms = ["pass", "eligible", "allowed", "permitted", "mandatory", "compulsory"]
+    neg_terms = ["fail", "ineligible", "detained", "prohibited", "not allowed", "not permitted", "exempt", "waived"]
+    for pos in pos_terms:
+        for neg in neg_terms:
+            if (re.search(rf"\b{pos}\b", lower_a) and re.search(rf"\b{neg}\b", lower_b)) or \
+               (re.search(rf"\b{neg}\b", lower_a) and re.search(rf"\b{pos}\b", lower_b)):
+                return True
 
     return False
 
@@ -164,19 +241,19 @@ def resolve_precedence(
             targets = [t.strip() for t in c["supersedes"].split(";") if t.strip()]
             for target in targets:
                 t_doc, _, t_sec = target.partition("#")
-                superseded_targets.append((t_doc.strip().lower(), normalize_section_ref(t_sec)))
+                superseded_targets.append((t_doc.strip().lower(), t_sec.strip()))
                 supersession_reasons.append(f"{c.get('doc_id')} explicitly supersedes {target} (step 2)")
 
     surviving = []
     superseded_chunks = []
     for c in applicable:
         c_doc = c.get("doc_id", "").strip().lower()
-        c_sec_norm = normalize_section_ref(c.get("section", ""))
+        c_sec = c.get("section", "")
         is_superseded = False
 
-        for t_doc, t_sec_norm in superseded_targets:
+        for t_doc, t_sec in superseded_targets:
             if t_doc == c_doc:
-                if not t_sec_norm or t_sec_norm == c_sec_norm or t_sec_norm in c_sec_norm or c_sec_norm in t_sec_norm:
+                if is_clause_match(t_sec, c_sec):
                     is_superseded = True
                     break
 
