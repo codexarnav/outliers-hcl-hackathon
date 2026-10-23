@@ -34,8 +34,6 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
 
-    class Config:
-        env_file = ".env"
-        extra = "allow"
+    model_config = {"env_file": ".env", "extra": "allow"}
 
 settings = Settings()

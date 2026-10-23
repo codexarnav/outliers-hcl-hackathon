@@ -499,8 +499,8 @@ def check_promotion_eligibility(
                 "source_section": promo_rule["source_section"]
             })
 
-        # Special criteria for entering 3rd year (5th semester)
-        if target_semester >= 5 and current_sem < 5:
+        # Criteria for entering 3rd year (5th semester) or beyond
+        if target_semester >= 5:
             if active_backlogs <= max_allowed:
                 result = "ELIGIBLE"
                 explanation = (

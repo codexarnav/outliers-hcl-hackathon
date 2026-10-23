@@ -30,6 +30,8 @@ def is_scope_applicable(doc_scope: str, student_val: str) -> bool:
     """Checks if student's programme or batch matches document scope."""
     if not doc_scope or doc_scope.strip().upper() == "ALL":
         return True
+    if not student_val or student_val.strip().upper() == "ALL":
+        return True
     allowed = [s.strip().lower() for s in doc_scope.split(",")]
     s_val = student_val.strip().lower()
 
@@ -122,21 +124,38 @@ def resolve_precedence(
     superseded_ids = set()
     supersession_reasons = []
 
+    def normalize_ref(ref: str) -> str:
+        return ref.lower().replace("clause", "").replace("section", "").replace(" ", "").strip()
+
     for c in applicable:
         auth = int(c.get("authority_level", 5))
         if auth in (1, 2) and c.get("supersedes"):
             targets = [t.strip() for t in c["supersedes"].split(";") if t.strip()]
             for target in targets:
                 superseded_ids.add(target.lower())
+                superseded_ids.add(normalize_ref(target))
+                # Also add bare doc_id if target is doc_id#section
+                if "#" in target:
+                    superseded_ids.add(normalize_ref(target.split("#")[0]))
                 supersession_reasons.append(f"{c.get('doc_id')} explicitly supersedes {target} (step 2)")
 
     surviving = []
     superseded_chunks = []
     for c in applicable:
-        doc_id = c.get("doc_id", "").lower()
-        section = c.get("section", "").lower()
+        doc_id = c.get("doc_id", "").lower().strip()
+        section = c.get("section", "").lower().strip()
         full_ref = f"{doc_id}#{section}"
-        if doc_id in superseded_ids or full_ref in superseded_ids:
+        norm_ref = normalize_ref(full_ref)
+        norm_doc = normalize_ref(doc_id)
+
+        is_superseded = (
+            doc_id in superseded_ids or
+            norm_doc in superseded_ids or
+            full_ref in superseded_ids or
+            norm_ref in superseded_ids or
+            any(s in norm_ref for s in superseded_ids if "#" in s)
+        )
+        if is_superseded:
             superseded_chunks.append(c)
         else:
             surviving.append(c)
@@ -145,36 +164,74 @@ def resolve_precedence(
         # If all were somehow marked superseded, retain the latest superseder
         surviving = [applicable[0]]
 
-    # Step 3 & 4: Authority and Recency Sorting
+    # Step 3 & 4: Authority and Recency Comparison
     # Filter out Level 5 for authoritative decisions (informational only)
     authoritative = [c for c in surviving if int(c.get("authority_level", 5)) < 5]
     if not authoritative:
         authoritative = surviving
 
-    def sort_key(c):
-        auth = int(c.get("authority_level", 5))
-        eff_dt = parse_date(c.get("effective_from", "")) or datetime(1970, 1, 1)
-        # Higher authority = lower integer (1 is highest)
-        # Later date = higher datetime
-        return (auth, -eff_dt.timestamp())
+    def is_competing(w: Dict[str, Any], c: Dict[str, Any]) -> bool:
+        """Determines if two candidate documents compete/address the same academic domain topic."""
+        w_doc = w.get("doc_id", "").lower().strip()
+        c_supersedes = c.get("supersedes", "").lower().strip()
+        if w_doc and w_doc in c_supersedes:
+            return True
 
-    authoritative.sort(key=sort_key)
+        domain_topics = [
+            "fee", "tuition", "attendance", "absent", "condonation", "sports",
+            "supplementary", "makeup", "placement", "elective", "cws", "hostel"
+        ]
+        w_text = (w.get("title", "") + " " + w.get("text", "")).lower()
+        c_text = (c.get("title", "") + " " + c.get("text", "")).lower()
+        shared = [t for t in domain_topics if (t in w_text and t in c_text)]
+        return len(shared) > 0
+
+    # Winner starts as top retrieved candidate
     winner = authoritative[0]
 
+    # Evaluate whether any other competing candidate overrides winner on the same topic
+    for candidate in authoritative[1:]:
+        if not is_competing(winner, candidate):
+            continue
+
+        c_auth = int(candidate.get("authority_level", 5))
+        w_auth = int(winner.get("authority_level", 5))
+        c_date = parse_date(candidate.get("effective_from", "")) or datetime(1970, 1, 1)
+        w_date = parse_date(winner.get("effective_from", "")) or datetime(1970, 1, 1)
+
+        # Higher authority prevails on competing topic
+        if c_auth < w_auth:
+            winner = candidate
+        # Equal authority: later effective date prevails
+        elif c_auth == w_auth and c_date > w_date:
+            winner = candidate
+
     # Step 5: Check for Unresolved Conflicts
-    # If there is another document with equal authority, identical effective date,
-    # and differing content
+    # Only flag conflict if both documents address the same section/rule or share supersession targets
     conflicts = []
+    winner_supersedes = set(t.strip().lower() for t in winner.get("supersedes", "").split(";") if t.strip())
+    winner_sec = winner.get("section", "").strip().lower()
+    winner_doc = winner.get("doc_id", "")
+
     for other in authoritative[1:]:
         if (int(other.get("authority_level", 5)) == int(winner.get("authority_level", 5)) and
             other.get("effective_from") == winner.get("effective_from") and
-            other.get("doc_id") != winner.get("doc_id")):
-            conflicts.append({
-                "doc_a": winner.get("doc_id"),
-                "doc_b": other.get("doc_id"),
-                "authority_level": winner.get("authority_level"),
-                "effective_from": winner.get("effective_from")
-            })
+            other.get("doc_id") != winner_doc):
+            
+            other_supersedes = set(t.strip().lower() for t in other.get("supersedes", "").split(";") if t.strip())
+            other_sec = other.get("section", "").strip().lower()
+
+            # Conflict triggers if they target the same section or same supersedes clause
+            shared_supersedes = winner_supersedes & other_supersedes
+            same_section = (winner_sec and other_sec and (winner_sec == other_sec or winner_sec in other_sec or other_sec in winner_sec))
+
+            if shared_supersedes or same_section:
+                conflicts.append({
+                    "doc_a": winner_doc,
+                    "doc_b": other.get("doc_id"),
+                    "authority_level": winner.get("authority_level"),
+                    "effective_from": winner.get("effective_from")
+                })
 
     if conflicts:
         return {

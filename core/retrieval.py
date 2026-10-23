@@ -3,6 +3,7 @@ Hybrid Retrieval Engine (Dense ChromaDB + Sparse SQLite FTS5 BM25 + Reciprocal R
 """
 
 import os
+import re
 import sys
 import sqlite3
 from pathlib import Path
@@ -211,22 +212,25 @@ def hybrid_search(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
     # Sort candidates by merged RRF score
     sorted_candidates = sorted(rrf_scores.items(), key=lambda x: x[1], reverse=True)
 
-    # Cross-scoring keyword boost (lexical + exact phrase alignment)
+    # Cross-scoring dynamic keyword boost (lexical + query term alignment)
     final_scored = []
     q_lower = query.lower()
+    query_words = set(re.findall(r'\b[a-zA-Z]{3,}\b', q_lower)) - {
+        "what", "which", "when", "where", "about", "under", "shall", "student", "university", "the", "for", "with"
+    }
+
     for cid, rrf_score in sorted_candidates[:15]:
         item = chunk_map[cid]
         text_lower = item["text"].lower()
         score = rrf_score
 
-        # Boost for exact clause citations (e.g. R.1(B).22)
-        for term in ["r.1(b).22", "attendance", "supplementary", "cws", "fee", "make-up", "fail"]:
-            if term in q_lower and term in text_lower:
-                score += 0.05
-        
-        # Boost for primary regulation level
-        if item.get("authority_level") == 1:
-            score += 0.01
+        # Overlap boost based on specific query terms
+        matching_words = sum(1 for w in query_words if w in text_lower)
+        score += matching_words * 0.01
+
+        # Boost for exact clause reference (e.g. R.1(B).22)
+        if "r.1(b).22" in q_lower and "r.1(b).22" in text_lower:
+            score += 0.03
 
         item["score"] = round(score, 4)
         final_scored.append(item)
