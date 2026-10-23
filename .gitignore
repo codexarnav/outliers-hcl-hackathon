@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+logs/*.log
+data/raw/*.pdf
+!data/raw/.gitkeep
