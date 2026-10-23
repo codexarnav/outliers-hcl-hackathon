@@ -1,0 +1,13 @@
+course_code,course_name,programme,semester,credits
+CS501,Data Mining,B.Tech CSE,5,4
+CS502,Database Systems,B.Tech CSE,5,4
+CS503,Software Engineering,B.Tech CSE,5,3
+CS701,Distributed Systems,B.Tech CSE,7,4
+CS702,Machine Learning,B.Tech CSE,7,4
+CS703,Cloud Computing,B.Tech CSE,7,3
+IT501,Web Technologies,B.Tech IT,5,4
+IT502,Computer Networks,B.Tech IT,5,4
+IT503,Information Security,B.Tech IT,5,3
+IT701,Data Analytics,B.Tech IT,7,4
+IT702,Mobile Computing,B.Tech IT,7,4
+IT703,Software Testing,B.Tech IT,7,3

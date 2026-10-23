@@ -1,0 +1,3938 @@
+{
+ "students": [
+  {
+   "student_id": "S1001",
+   "full_name": "Aarav Mehta",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 8.12,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1002",
+   "full_name": "Diya Kapoor",
+   "programme": "B.Tech IT",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 7.45,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1003",
+   "full_name": "Kabir Sethi",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 6.81,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1004",
+   "full_name": "Meera Bansal",
+   "programme": "B.Tech IT",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 9.02,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1005",
+   "full_name": "Ishaan Malhotra",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 7.0,
+   "active_backlogs": 2
+  },
+  {
+   "student_id": "S1006",
+   "full_name": "Tara Khanna",
+   "programme": "B.Tech IT",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 5.92,
+   "active_backlogs": 3
+  },
+  {
+   "student_id": "S1007",
+   "full_name": "Reyansh Arora",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 7.0,
+   "active_backlogs": 2
+  },
+  {
+   "student_id": "S1008",
+   "full_name": "Anaya Menon",
+   "programme": "B.Tech IT",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 7.76,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1009",
+   "full_name": "Vivaan Rao",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 6.35,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1010",
+   "full_name": "Kiara Anand",
+   "programme": "B.Tech IT",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 8.9,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1011",
+   "full_name": "Advik Sharma",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 7.23,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1012",
+   "full_name": "Myra Iyer",
+   "programme": "B.Tech IT",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 6.7,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1013",
+   "full_name": "Arjun Dutta",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 6.99,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1014",
+   "full_name": "Saanvi Joshi",
+   "programme": "B.Tech IT",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 7.01,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1015",
+   "full_name": "Rohan Gill",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 7.88,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1016",
+   "full_name": "Ira Chawla",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 6.92,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1017",
+   "full_name": "Devansh Nair",
+   "programme": "B.Tech CSE",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 8.22,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1018",
+   "full_name": "Aditi Sen",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 7.0,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1019",
+   "full_name": "Kian Verma",
+   "programme": "B.Tech CSE",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 6.1,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1020",
+   "full_name": "Nisha Roy",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 9.11,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1021",
+   "full_name": "Yuvan Das",
+   "programme": "B.Tech CSE",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 7.62,
+   "active_backlogs": 2
+  },
+  {
+   "student_id": "S1022",
+   "full_name": "Rhea Saxena",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 5.88,
+   "active_backlogs": 2
+  },
+  {
+   "student_id": "S1023",
+   "full_name": "Atharv Pillai",
+   "programme": "B.Tech CSE",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 8.44,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1024",
+   "full_name": "Navya Bose",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 6.55,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1025",
+   "full_name": "Samarth Jain",
+   "programme": "B.Tech CSE",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 7.31,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1026",
+   "full_name": "Pari Kulkarni",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 8.73,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1027",
+   "full_name": "Dhruv Thomas",
+   "programme": "B.Tech CSE",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 6.22,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1028",
+   "full_name": "Ishita Ghosh",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 7.95,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1029",
+   "full_name": "Neil Oberoi",
+   "programme": "B.Tech CSE",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 5.67,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1030",
+   "full_name": "Avni Prasad",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 8.06,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1031",
+   "full_name": "Riya Kapoor",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 5,
+   "cgpa": 7.0,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1032",
+   "full_name": "Kabir Malhotra",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 6.9,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1033",
+   "full_name": "Meera Nair",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 8.6,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1034",
+   "full_name": "Arjun Bansal",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 7,
+   "cgpa": 5.5,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1035",
+   "full_name": "Sana Qureshi",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 5,
+   "cgpa": 7.2,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1036",
+   "full_name": "Dev Khanna",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 8.9,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1037",
+   "full_name": "Tara Menon",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 5.8,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1038",
+   "full_name": "Ishaan Sethi",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 7,
+   "cgpa": 7.5,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1039",
+   "full_name": "Aditi Rao",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 5,
+   "cgpa": 9.2,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1040",
+   "full_name": "Rehan Siddiqui",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 6.1,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1041",
+   "full_name": "Myra Chopra",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 7.8,
+   "active_backlogs": 2
+  },
+  {
+   "student_id": "S1042",
+   "full_name": "Vivaan Das",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 7,
+   "cgpa": 9.5,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1043",
+   "full_name": "Naina Bhatia",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 5,
+   "cgpa": 6.4,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1044",
+   "full_name": "Yash Arora",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 8.1,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1045",
+   "full_name": "Kiara Jain",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 9.8,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1046",
+   "full_name": "Advik Mishra",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 7,
+   "cgpa": 6.7,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1047",
+   "full_name": "Sara Thomas",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 5,
+   "cgpa": 8.4,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1048",
+   "full_name": "Dhruv Goyal",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 5.3,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1049",
+   "full_name": "Anaya Pillai",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 7.0,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1050",
+   "full_name": "Rohan Verma",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 7,
+   "cgpa": 8.7,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1051",
+   "full_name": "Diya Singh",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 5,
+   "cgpa": 5.6,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1052",
+   "full_name": "Kunal Mehta",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 7.3,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1053",
+   "full_name": "Ira Shah",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 9.0,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1054",
+   "full_name": "Ayaan Roy",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 7,
+   "cgpa": 5.9,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1055",
+   "full_name": "Sia Kulkarni",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 5,
+   "cgpa": 7.6,
+   "active_backlogs": 0
+  },
+  {
+   "student_id": "S1056",
+   "full_name": "Manav Joshi",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 9.3,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1057",
+   "full_name": "Navya Iyer",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 7,
+   "cgpa": 6.2,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1058",
+   "full_name": "Reyansh Patel",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 7,
+   "cgpa": 7.9,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1059",
+   "full_name": "Mahi Saxena",
+   "programme": "B.Tech CSE",
+   "batch_year": 2023,
+   "current_semester": 5,
+   "cgpa": 9.6,
+   "active_backlogs": 1
+  },
+  {
+   "student_id": "S1060",
+   "full_name": "Atharv Dutta",
+   "programme": "B.Tech IT",
+   "batch_year": 2024,
+   "current_semester": 5,
+   "cgpa": 6.5,
+   "active_backlogs": 0
+  }
+ ],
+ "courses": [
+  {
+   "course_code": "CS501",
+   "course_name": "Data Mining",
+   "programme": "B.Tech CSE",
+   "semester": 5,
+   "credits": 4
+  },
+  {
+   "course_code": "CS502",
+   "course_name": "Database Systems",
+   "programme": "B.Tech CSE",
+   "semester": 5,
+   "credits": 4
+  },
+  {
+   "course_code": "CS503",
+   "course_name": "Software Engineering",
+   "programme": "B.Tech CSE",
+   "semester": 5,
+   "credits": 3
+  },
+  {
+   "course_code": "CS701",
+   "course_name": "Distributed Systems",
+   "programme": "B.Tech CSE",
+   "semester": 7,
+   "credits": 4
+  },
+  {
+   "course_code": "CS702",
+   "course_name": "Machine Learning",
+   "programme": "B.Tech CSE",
+   "semester": 7,
+   "credits": 4
+  },
+  {
+   "course_code": "CS703",
+   "course_name": "Cloud Computing",
+   "programme": "B.Tech CSE",
+   "semester": 7,
+   "credits": 3
+  },
+  {
+   "course_code": "IT501",
+   "course_name": "Web Technologies",
+   "programme": "B.Tech IT",
+   "semester": 5,
+   "credits": 4
+  },
+  {
+   "course_code": "IT502",
+   "course_name": "Computer Networks",
+   "programme": "B.Tech IT",
+   "semester": 5,
+   "credits": 4
+  },
+  {
+   "course_code": "IT503",
+   "course_name": "Information Security",
+   "programme": "B.Tech IT",
+   "semester": 5,
+   "credits": 3
+  },
+  {
+   "course_code": "IT701",
+   "course_name": "Data Analytics",
+   "programme": "B.Tech IT",
+   "semester": 7,
+   "credits": 4
+  },
+  {
+   "course_code": "IT702",
+   "course_name": "Mobile Computing",
+   "programme": "B.Tech IT",
+   "semester": 7,
+   "credits": 4
+  },
+  {
+   "course_code": "IT703",
+   "course_name": "Software Testing",
+   "programme": "B.Tech IT",
+   "semester": 7,
+   "credits": 3
+  }
+ ],
+ "attendance": [
+  {
+   "student_id": "S1001",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1001",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1001",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1002",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1002",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1002",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 19
+  },
+  {
+   "student_id": "S1003",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1003",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 19
+  },
+  {
+   "student_id": "S1003",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1004",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1004",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1004",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1005",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 10
+  },
+  {
+   "student_id": "S1005",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1005",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1006",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1006",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1006",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 12
+  },
+  {
+   "student_id": "S1007",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1007",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 12
+  },
+  {
+   "student_id": "S1007",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1008",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 0
+  },
+  {
+   "student_id": "S1008",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1008",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1009",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1009",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1009",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1010",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1010",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1010",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 19
+  },
+  {
+   "student_id": "S1011",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1011",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 19
+  },
+  {
+   "student_id": "S1011",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1012",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 19
+  },
+  {
+   "student_id": "S1012",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1012",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1013",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1013",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1013",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1014",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1014",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1014",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1015",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1015",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1015",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1016",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1016",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1016",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1017",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1017",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1017",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 19
+  },
+  {
+   "student_id": "S1018",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1018",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 19
+  },
+  {
+   "student_id": "S1018",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1019",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 19
+  },
+  {
+   "student_id": "S1019",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1019",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1020",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1020",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1020",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1021",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1021",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1021",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 12
+  },
+  {
+   "student_id": "S1022",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1022",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 12
+  },
+  {
+   "student_id": "S1022",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1023",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 12
+  },
+  {
+   "student_id": "S1023",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1023",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1024",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1024",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1024",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1025",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1025",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1025",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 19
+  },
+  {
+   "student_id": "S1026",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1026",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 19
+  },
+  {
+   "student_id": "S1026",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1027",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 19
+  },
+  {
+   "student_id": "S1027",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1027",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1028",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1028",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1028",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1029",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1029",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1029",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1030",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1030",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1030",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1031",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1031",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1031",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1032",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1032",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1032",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1033",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1033",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1033",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1034",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1034",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1034",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1035",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1035",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1035",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1036",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1036",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1036",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1037",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1037",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1037",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1038",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1038",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1038",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1039",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1039",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1039",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1040",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1040",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1040",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1041",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1041",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1041",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1042",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1042",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1042",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1043",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1043",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1043",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1044",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1044",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1044",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1045",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1045",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1045",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1046",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1046",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1046",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1047",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1047",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1047",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1048",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1048",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1048",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1049",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1049",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1049",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1050",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1050",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1050",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1051",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1051",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1051",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1052",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1052",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1052",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1053",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1053",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1053",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1054",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1054",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1054",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1055",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1055",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1055",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1056",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 18
+  },
+  {
+   "student_id": "S1056",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1056",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1057",
+   "course_code": "CS701",
+   "classes_held": 20,
+   "classes_attended": 16
+  },
+  {
+   "student_id": "S1057",
+   "course_code": "CS702",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1057",
+   "course_code": "CS703",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1058",
+   "course_code": "IT701",
+   "classes_held": 20,
+   "classes_attended": 15
+  },
+  {
+   "student_id": "S1058",
+   "course_code": "IT702",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1058",
+   "course_code": "IT703",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1059",
+   "course_code": "CS501",
+   "classes_held": 20,
+   "classes_attended": 14
+  },
+  {
+   "student_id": "S1059",
+   "course_code": "CS502",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1059",
+   "course_code": "CS503",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1060",
+   "course_code": "IT501",
+   "classes_held": 20,
+   "classes_attended": 17
+  },
+  {
+   "student_id": "S1060",
+   "course_code": "IT502",
+   "classes_held": 20,
+   "classes_attended": 20
+  },
+  {
+   "student_id": "S1060",
+   "course_code": "IT503",
+   "classes_held": 20,
+   "classes_attended": 18
+  }
+ ],
+ "results": [
+  {
+   "student_id": "S1001",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "21",
+   "external_marks": "44",
+   "total_marks": "65",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1001",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "24",
+   "external_marks": "50",
+   "total_marks": "74",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1001",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "27",
+   "external_marks": "56",
+   "total_marks": "83",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1002",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1002",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "28",
+   "external_marks": "56",
+   "total_marks": "84",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1002",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "63",
+   "total_marks": "93",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1003",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "13",
+   "external_marks": "26",
+   "total_marks": "39",
+   "max_marks": "100",
+   "result": "FAIL"
+  },
+  {
+   "student_id": "S1003",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": 14,
+   "external_marks": 26,
+   "total_marks": 40,
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1003",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "29",
+   "external_marks": "58",
+   "total_marks": "87",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1004",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "ABSENT"
+  },
+  {
+   "student_id": "S1004",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1004",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "67",
+   "total_marks": "97",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1005",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1005",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "68",
+   "total_marks": "98",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1005",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1006",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "11",
+   "external_marks": "24",
+   "total_marks": "35",
+   "max_marks": "100",
+   "result": "FAIL"
+  },
+  {
+   "student_id": "S1006",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "11",
+   "external_marks": "24",
+   "total_marks": "35",
+   "max_marks": "100",
+   "result": "FAIL"
+  },
+  {
+   "student_id": "S1006",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1007",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1007",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1007",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "61",
+   "total_marks": "91",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1008",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1008",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "62",
+   "total_marks": "92",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1008",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1009",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "63",
+   "total_marks": "93",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1009",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1009",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "65",
+   "total_marks": "95",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1010",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1010",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "66",
+   "total_marks": "96",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1010",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1011",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1011",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "23",
+   "external_marks": "47",
+   "total_marks": "70",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1011",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "26",
+   "external_marks": "53",
+   "total_marks": "79",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1012",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "23",
+   "external_marks": "48",
+   "total_marks": "71",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1012",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "26",
+   "external_marks": "54",
+   "total_marks": "80",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1012",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "29",
+   "external_marks": "60",
+   "total_marks": "89",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1013",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "27",
+   "external_marks": "54",
+   "total_marks": "81",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1013",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "60",
+   "total_marks": "90",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1013",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "69",
+   "total_marks": "99",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1014",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "61",
+   "total_marks": "91",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1014",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1014",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "63",
+   "total_marks": "93",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1015",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1015",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1015",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1016",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1016",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "22",
+   "external_marks": "46",
+   "total_marks": "68",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1016",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "25",
+   "external_marks": "52",
+   "total_marks": "77",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1017",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "23",
+   "external_marks": "46",
+   "total_marks": "69",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1017",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "26",
+   "external_marks": "52",
+   "total_marks": "78",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1017",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "29",
+   "external_marks": "58",
+   "total_marks": "87",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1018",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "26",
+   "external_marks": "53",
+   "total_marks": "79",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1018",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "29",
+   "external_marks": "59",
+   "total_marks": "88",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1018",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "67",
+   "total_marks": "97",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1019",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "29",
+   "external_marks": "60",
+   "total_marks": "89",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1019",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "68",
+   "total_marks": "98",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1019",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "61",
+   "total_marks": "91",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1020",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "69",
+   "total_marks": "99",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1020",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1020",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1021",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1021",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1021",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1022",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1022",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1022",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "28",
+   "external_marks": "57",
+   "total_marks": "85",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1023",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1023",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "28",
+   "external_marks": "58",
+   "total_marks": "86",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1023",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "65",
+   "total_marks": "95",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1024",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "29",
+   "external_marks": "58",
+   "total_marks": "87",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1024",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "66",
+   "total_marks": "96",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1024",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1025",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "67",
+   "total_marks": "97",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1025",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1025",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "69",
+   "total_marks": "99",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1026",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1026",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1026",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "24",
+   "external_marks": "49",
+   "total_marks": "73",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1027",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "27",
+   "external_marks": "54",
+   "total_marks": "81",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1027",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "24",
+   "external_marks": "50",
+   "total_marks": "74",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1027",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "27",
+   "external_marks": "56",
+   "total_marks": "83",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1028",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "25",
+   "external_marks": "50",
+   "total_marks": "75",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1028",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "28",
+   "external_marks": "56",
+   "total_marks": "84",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1028",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "63",
+   "total_marks": "93",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1029",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "28",
+   "external_marks": "57",
+   "total_marks": "85",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1029",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "64",
+   "total_marks": "94",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1029",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1030",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "65",
+   "total_marks": "95",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1030",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "70",
+   "total_marks": "100",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1030",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "67",
+   "total_marks": "97",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1003",
+   "course_code": "CS701",
+   "exam_session": "2026-AUG",
+   "exam_type": "SUPPLEMENTARY",
+   "internal_marks": "13",
+   "external_marks": "32",
+   "total_marks": "45",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1031",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "24",
+   "external_marks": "50",
+   "total_marks": "74",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1031",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "28",
+   "external_marks": "57",
+   "total_marks": "85",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1031",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "12",
+   "external_marks": "26",
+   "total_marks": "38",
+   "max_marks": "100",
+   "result": "FAIL"
+  },
+  {
+   "student_id": "S1032",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "27",
+   "external_marks": "54",
+   "total_marks": "81",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1032",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "62",
+   "total_marks": "92",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1032",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "15",
+   "external_marks": "30",
+   "total_marks": "45",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1033",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "29",
+   "external_marks": "59",
+   "total_marks": "88",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1033",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "13",
+   "external_marks": "28",
+   "total_marks": "41",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1033",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1034",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "65",
+   "total_marks": "95",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1034",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1034",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "19",
+   "external_marks": "40",
+   "total_marks": "59",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1035",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1035",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "18",
+   "external_marks": "37",
+   "total_marks": "55",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1035",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "22",
+   "external_marks": "44",
+   "total_marks": "66",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1036",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "17",
+   "external_marks": "34",
+   "total_marks": "51",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1036",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "20",
+   "external_marks": "42",
+   "total_marks": "62",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1036",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "24",
+   "external_marks": "49",
+   "total_marks": "73",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1037",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "19",
+   "external_marks": "39",
+   "total_marks": "58",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1037",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "23",
+   "external_marks": "46",
+   "total_marks": "69",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1037",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "26",
+   "external_marks": "54",
+   "total_marks": "80",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1038",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "21",
+   "external_marks": "44",
+   "total_marks": "65",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1038",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "25",
+   "external_marks": "51",
+   "total_marks": "76",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1038",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "29",
+   "external_marks": "58",
+   "total_marks": "87",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1039",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "24",
+   "external_marks": "48",
+   "total_marks": "72",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1039",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "27",
+   "external_marks": "56",
+   "total_marks": "83",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1039",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1040",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "26",
+   "external_marks": "53",
+   "total_marks": "79",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1040",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1040",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "14",
+   "external_marks": "29",
+   "total_marks": "43",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1041",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1041",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "13",
+   "external_marks": "26",
+   "total_marks": "39",
+   "max_marks": "100",
+   "result": "FAIL"
+  },
+  {
+   "student_id": "S1041",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "16",
+   "external_marks": "34",
+   "total_marks": "50",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1042",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "63",
+   "total_marks": "93",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1042",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "15",
+   "external_marks": "31",
+   "total_marks": "46",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1042",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "19",
+   "external_marks": "38",
+   "total_marks": "57",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1043",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "14",
+   "external_marks": "28",
+   "total_marks": "42",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1043",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "17",
+   "external_marks": "36",
+   "total_marks": "53",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1043",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "21",
+   "external_marks": "43",
+   "total_marks": "64",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1044",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "16",
+   "external_marks": "33",
+   "total_marks": "49",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1044",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "20",
+   "external_marks": "40",
+   "total_marks": "60",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1044",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "23",
+   "external_marks": "48",
+   "total_marks": "71",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1045",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "18",
+   "external_marks": "38",
+   "total_marks": "56",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1045",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "22",
+   "external_marks": "45",
+   "total_marks": "67",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1045",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1046",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "21",
+   "external_marks": "42",
+   "total_marks": "63",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1046",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1046",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "28",
+   "external_marks": "57",
+   "total_marks": "85",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1047",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1047",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "27",
+   "external_marks": "54",
+   "total_marks": "81",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1047",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "62",
+   "total_marks": "92",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1048",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "25",
+   "external_marks": "52",
+   "total_marks": "77",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1048",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "29",
+   "external_marks": "59",
+   "total_marks": "88",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1048",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "13",
+   "external_marks": "28",
+   "total_marks": "41",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1049",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "28",
+   "external_marks": "56",
+   "total_marks": "84",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1049",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "65",
+   "total_marks": "95",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1049",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "16",
+   "external_marks": "32",
+   "total_marks": "48",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1050",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "61",
+   "total_marks": "91",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1050",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "14",
+   "external_marks": "30",
+   "total_marks": "44",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1050",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "18",
+   "external_marks": "37",
+   "total_marks": "55",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1051",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "13",
+   "external_marks": "27",
+   "total_marks": "40",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1051",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "17",
+   "external_marks": "34",
+   "total_marks": "51",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1051",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1052",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "15",
+   "external_marks": "32",
+   "total_marks": "47",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1052",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1052",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "23",
+   "external_marks": "46",
+   "total_marks": "69",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1053",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1053",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "21",
+   "external_marks": "44",
+   "total_marks": "65",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1053",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "25",
+   "external_marks": "51",
+   "total_marks": "76",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1054",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "20",
+   "external_marks": "41",
+   "total_marks": "61",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1054",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "24",
+   "external_marks": "48",
+   "total_marks": "72",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1054",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "27",
+   "external_marks": "56",
+   "total_marks": "83",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1055",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "22",
+   "external_marks": "46",
+   "total_marks": "68",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1055",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "26",
+   "external_marks": "53",
+   "total_marks": "79",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1055",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "60",
+   "total_marks": "90",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1056",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "25",
+   "external_marks": "50",
+   "total_marks": "75",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1056",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "28",
+   "external_marks": "58",
+   "total_marks": "86",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1056",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "13",
+   "external_marks": "26",
+   "total_marks": "39",
+   "max_marks": "100",
+   "result": "FAIL"
+  },
+  {
+   "student_id": "S1057",
+   "course_code": "CS701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "27",
+   "external_marks": "55",
+   "total_marks": "82",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1057",
+   "course_code": "CS702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "30",
+   "external_marks": "63",
+   "total_marks": "93",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1057",
+   "course_code": "CS703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1058",
+   "course_code": "IT701",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "29",
+   "external_marks": "60",
+   "total_marks": "89",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1058",
+   "course_code": "IT702",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1058",
+   "course_code": "IT703",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "17",
+   "external_marks": "36",
+   "total_marks": "53",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1059",
+   "course_code": "CS501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "0",
+   "external_marks": "0",
+   "total_marks": "0",
+   "max_marks": "100",
+   "result": "DETAINED"
+  },
+  {
+   "student_id": "S1059",
+   "course_code": "CS502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "16",
+   "external_marks": "33",
+   "total_marks": "49",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1059",
+   "course_code": "CS503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "20",
+   "external_marks": "40",
+   "total_marks": "60",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1060",
+   "course_code": "IT501",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "15",
+   "external_marks": "30",
+   "total_marks": "45",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1060",
+   "course_code": "IT502",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "18",
+   "external_marks": "38",
+   "total_marks": "56",
+   "max_marks": "100",
+   "result": "PASS"
+  },
+  {
+   "student_id": "S1060",
+   "course_code": "IT503",
+   "exam_session": "2026-MAY",
+   "exam_type": "REGULAR",
+   "internal_marks": "22",
+   "external_marks": "45",
+   "total_marks": "67",
+   "max_marks": "100",
+   "result": "PASS"
+  }
+ ],
+ "rule_registry": [
+  {
+   "rule_id": "ATT-MIN-01",
+   "description": "Minimum attendance required for examination eligibility under the synthetic base policy.",
+   "parameter": "min_attendance_pct",
+   "operator": ">=",
+   "value": "75",
+   "scope_programmes": "ALL",
+   "scope_batches": "ALL",
+   "effective_from": "2025-01-01",
+   "effective_to": "",
+   "source_doc_id": "SRC-ATT-001",
+   "source_section": "Section 2.1"
+  },
+  {
+   "rule_id": "EXAM-PASS-01",
+   "description": "Minimum total marks required to pass a regular course examination under the synthetic policy.",
+   "parameter": "min_total_marks",
+   "operator": ">=",
+   "value": "40",
+   "scope_programmes": "ALL",
+   "scope_batches": "ALL",
+   "effective_from": "2025-01-01",
+   "effective_to": "",
+   "source_doc_id": "SRC-EXAM-001",
+   "source_section": "Section 3.2"
+  },
+  {
+   "rule_id": "PLAC-CGPA-01",
+   "description": "Synthetic placement eligibility CGPA cutoff for test scenarios.",
+   "parameter": "placement_min_cgpa",
+   "operator": ">=",
+   "value": "7.00",
+   "scope_programmes": "ALL",
+   "scope_batches": "ALL",
+   "effective_from": "2025-01-01",
+   "effective_to": "",
+   "source_doc_id": "SRC-PLAC-001",
+   "source_section": "Section 1.1"
+  },
+  {
+   "rule_id": "ATT-MIN-02",
+   "description": "Future revised minimum attendance threshold, effective from 2027; not active for the 2026 dataset snapshot.",
+   "parameter": "min_attendance_pct",
+   "operator": ">=",
+   "value": "80",
+   "scope_programmes": "ALL",
+   "scope_batches": "ALL",
+   "effective_from": "2027-01-01",
+   "effective_to": "",
+   "source_doc_id": "SRC-CIRC-002",
+   "source_section": "Circular 2, Clause 1"
+  }
+ ],
+ "source_register": [
+  {
+   "source_doc_id": "SRC-ATT-001",
+   "document_title": "Synthetic Academic Attendance Policy v1",
+   "document_type": "Synthetic policy",
+   "issued_on": "2024-12-15",
+   "description": "Fictional test document defining a 75% minimum attendance threshold."
+  },
+  {
+   "source_doc_id": "SRC-EXAM-001",
+   "document_title": "Synthetic Examination Rules v1",
+   "document_type": "Synthetic policy",
+   "issued_on": "2024-12-15",
+   "description": "Fictional test document defining the 40/100 passing threshold."
+  },
+  {
+   "source_doc_id": "SRC-PLAC-001",
+   "document_title": "Synthetic Placement Eligibility Rules v1",
+   "document_type": "Synthetic policy",
+   "issued_on": "2024-12-15",
+   "description": "Fictional test document defining a CGPA cutoff of 7.00."
+  },
+  {
+   "source_doc_id": "SRC-CIRC-002",
+   "document_title": "Synthetic Attendance Circular 2",
+   "document_type": "Synthetic circular",
+   "issued_on": "2026-09-01",
+   "description": "Fictional future-effective revision increasing minimum attendance to 80% from 2027-01-01."
+  }
+ ],
+ "edge_case_manifest": {
+  "attendance_exactly_75": [
+   [
+    "S1001",
+    "CS701"
+   ],
+   [
+    "S1004",
+    "IT703"
+   ],
+   [
+    "S1005",
+    "CS702"
+   ],
+   [
+    "S1019",
+    "CS503"
+   ],
+   [
+    "S1020",
+    "IT502"
+   ]
+  ],
+  "attendance_one_below_70": [
+   [
+    "S1002",
+    "IT701"
+   ],
+   [
+    "S1005",
+    "CS703"
+   ],
+   [
+    "S1007",
+    "CS701"
+   ],
+   [
+    "S1020",
+    "IT503"
+   ],
+   [
+    "S1021",
+    "CS502"
+   ]
+  ],
+  "zero_attendance": [
+   [
+    "S1008",
+    "IT701"
+   ]
+  ],
+  "full_attendance": [
+   [
+    "S1003",
+    "CS703"
+   ],
+   [
+    "S1004",
+    "IT702"
+   ],
+   [
+    "S1009",
+    "CS701"
+   ],
+   [
+    "S1011",
+    "CS703"
+   ],
+   [
+    "S1012",
+    "IT702"
+   ]
+  ],
+  "fail_39_of_100": [
+   [
+    "S1003",
+    "CS701"
+   ],
+   [
+    "S1041",
+    "CS702"
+   ],
+   [
+    "S1056",
+    "IT503"
+   ]
+  ],
+  "absent": [
+   [
+    "S1004",
+    "IT701"
+   ]
+  ],
+  "detained": [
+   [
+    "S1002",
+    "IT701"
+   ],
+   [
+    "S1005",
+    "CS701"
+   ],
+   [
+    "S1005",
+    "CS703"
+   ],
+   [
+    "S1006",
+    "IT703"
+   ],
+   [
+    "S1007",
+    "CS701"
+   ]
+  ],
+  "supplementary_preserves_regular": [
+   [
+    "S1003",
+    "CS701"
+   ]
+  ],
+  "multiple_backlogs": [
+   "S1005",
+   "S1006",
+   "S1007",
+   "S1021",
+   "S1022",
+   "S1041"
+  ],
+  "cgpa_exactly_7_00": [
+   "S1005",
+   "S1007",
+   "S1018",
+   "S1031",
+   "S1049"
+  ],
+  "cgpa_6_99": [
+   "S1013"
+  ],
+  "cgpa_7_01": [
+   "S1014"
+  ],
+  "pass_exactly_40_of_100": [
+   [
+    "S1003",
+    "CS702"
+   ]
+  ]
+ }
+}
