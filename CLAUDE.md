@@ -151,43 +151,55 @@
 
 ## 4. Current Implementation Status
 
-### Completed Milestones (Phase 1)
+### Completed Milestones (Phases 1 & 2)
 - [x] Initialized Git repository, set tracking branch to `origin/main`.
-- [x] Created feature branch `feat/foundation-dtu-corpus-and-mock`.
+- [x] Created feature branch `feat/foundation-dtu-corpus-and-mock`, submitted Pull Request #1.
 - [x] Virtual environment configured at `.venv` with Python 3.12 via `uv`.
 - [x] Defined dependencies in `pyproject.toml` and `requirements.txt`.
-- [x] Configured `.gitignore` and `.env.example`.
-- [x] Implemented core configuration `core/config.py` with `MOCK_LLM=true` support.
-- [x] Created `scripts/scrape_dtu.py` which downloaded/generated the DTU authentic corpus:
-  - `DTU-ORD-2021.pdf`: 335-page official DTU Ordinance (downloaded from `dtu.ac.in`).
-  - `DTU-ORD-2024.pdf`: 100-page official DTU 2024 Ordinance (downloaded from `dtu.ac.in`).
+- [x] Configured `.gitignore` and `.env.example` with `MOCK_LLM=true` support.
+- [x] Implemented core configuration `core/config.py`.
+- [x] Implemented `scripts/scrape_dtu.py` which downloaded/generated the DTU authentic corpus:
+  - `DTU-ORD-2021.pdf`: 335-page official DTU Ordinance (from `dtu.ac.in`).
+  - `DTU-ORD-2024.pdf`: 100-page official DTU 2024 Ordinance (from `dtu.ac.in`).
   - `DTU-CIR-ATT-2024.pdf`: Clause R.1(B).22 attendance notice & 5-mark CWS policy.
   - `DTU-CIR-EXAM-SUPP.pdf`: Supplementary & make-up exam guidelines.
   - `DTU-NOTIF-FEE-2024.pdf`: Annual academic fee notification.
   - `DTU-CSE-ELECT-FAQ.pdf`: CSE department advising FAQ.
-  - `DTU-SYN-AMEND-2026.pdf`: Synthetic attendance condonation amendment circular (1 of max 2 allowed).
+  - `DTU-SYN-AMEND-2026.pdf`: Synthetic attendance condonation amendment circular.
   - `data/source_register.csv`: Annex B metadata for all 7 documents.
   - `data/seed_rules.sql`: Pre-seeded DTU clauses for `rule_registry`.
+- [x] Created feature branch `feat/sqlite-student-kit`.
+- [x] Implemented `core/database.py` initializing SQLite tables: `students`, `courses`, `attendance`, `results`, `rule_registry`, and `audit_log`.
+- [x] Implemented `scripts/generate_students.py` generating 35 students and 8 courses with deliberate edge cases `S1001`–`S1008`.
+- [x] Implemented `scripts/validate_students.py` enforcing schema and invariant checks.
+- [x] Implemented `scripts/load_students.py` CLI loader supporting `--dir` and `--file` (tested with 167 records).
+- [x] Created Annex E Data Card at `docs/DATA_CARD.md`.
 
 ---
 
 ## 5. Next Steps for Successor Models
 
-### Next: Phase 2 — Database Engineering & Synthetic Student Kit
-1. **Branch:** `feat/sqlite-student-kit` (Create new branch after PR #1 is merged or branched from Phase 1).
+### Next: Phase 3 — Hybrid Retrieval & Annex A Precedence Engine
+1. **Branch:** `feat/hybrid-retrieval-precedence`
 2. **Tasks:**
-   - Implement `core/database.py`: SQLite connection, table migrations for Annex C (`students`, `courses`, `attendance`, `results`, `rule_registry`) and Annex D (`audit_log`).
-   - Implement `scripts/generate_students.py`: Generates $\ge 35$ students, $\ge 8$ courses across 3 batches (`2022`, `2023`, `2024`) with deliberate edge cases (`S1001` to `S1008`).
-   - Implement `scripts/validate_students.py`: Deterministic schema and constraint checker.
-   - Implement `scripts/load_students.py`: Mandatory CLI loader script (`--dir` and `--file` options).
-   - Author Annex E Data Card at `docs/DATA_CARD.md`.
+   - Implement `core/chunking.py`: Section-aware hierarchical chunker that splits PDFs by clause headers (e.g. `Clause R.1(B).22`, `Section 2`) while preserving table markdown and metadata (`doc_id`, `section`, `page`, `authority_level`, `effective_from`, etc.).
+   - Implement `core/retrieval.py`:
+     - Dense ChromaDB indexing (`data/chromadb`) using `BAAI/bge-small-en-v1.5`.
+     - Sparse SQLite FTS5 BM25 index on chunk text and clause headers.
+     - Reciprocal Rank Fusion (RRF) combining dense and sparse results.
+     - Cross-Encoder reranking (`ms-marco-MiniLM-L-6-v2`) to return top-5 chunks.
+   - Implement `core/precedence.py`:
+     - Deterministic Annex A Precedence Resolver implementing the 5 resolution steps:
+       1. Applicability filter (`effective_from <= as_of_date`, scope by batch/programme).
+       2. Explicit supersession (valid only if issued at Level 1 or 2).
+       3. Authority hierarchy (Level 1 > Level 2 > Level 3 > Level 4 > Level 5).
+       4. Recency (later `effective_from` wins between equal authority).
+       5. Unresolved conflicts return `answer_type: conflict_flagged`.
+       6. Level 5 is informational only; instructions inside documents are ignored.
 3. **Verification:**
-   ```bash
-   .venv/bin/python scripts/generate_students.py
-   .venv/bin/python scripts/validate_students.py
-   .venv/bin/python scripts/load_students.py --dir data/test_students/
-   ```
-4. **Git Action:** Commit changes, push to `origin/feat/sqlite-student-kit`, and run `gh pr create`.
+   - Unit tests checking supersession on synthetic condonation circular (`DTU-SYN-AMEND-2026` vs `DTU-ORD-2024`).
+   - Retrieval test verifying exact clause hit rate for `Clause R.1(B).22`.
+4. **Git Action:** Commit, push to `origin/feat/hybrid-retrieval-precedence`, open PR #3.
 
 ### Phase 3: Hybrid Retrieval & Annex A Precedence Engine
 * Chunker (`core/chunking.py`), ChromaDB dense + SQLite FTS5 BM25 indexer.
