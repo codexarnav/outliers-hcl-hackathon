@@ -6,6 +6,10 @@ Extracts structured chunks with clause headers, tables, and Annex B metadata.
 import os
 import re
 import csv
+import sys
+import tempfile
+import subprocess
+import shutil
 from pathlib import Path
 from typing import List, Dict, Any
 from pypdf import PdfReader
@@ -37,6 +41,61 @@ def load_source_register(register_path: Path) -> Dict[str, Dict[str, Any]]:
             docs[row["doc_id"]] = row
     return docs
 
+def ocr_image_bytes(image_data: bytes) -> str:
+    """Extracts text from scanned image bytes using available OCR engines."""
+    # 1. Try pytesseract if installed
+    try:
+        import pytesseract
+        from PIL import Image
+        import io
+        img = Image.open(io.BytesIO(image_data))
+        text = pytesseract.image_to_string(img)
+        if text.strip():
+            return text.strip()
+    except Exception:
+        pass
+
+    # 2. Try macOS native Vision OCR binary or script if available
+    mac_bin = Path(__file__).resolve().parent.parent / "scripts" / "bin" / "ocr_mac"
+    swift_script = Path(__file__).resolve().parent.parent / "scripts" / "ocr_vision.swift"
+    if sys.platform == "darwin":
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+                tmp.write(image_data)
+                tmp_path = tmp.name
+            try:
+                cmd = None
+                if mac_bin.exists():
+                    cmd = [str(mac_bin), tmp_path]
+                elif swift_script.exists() and shutil.which("swift"):
+                    cmd = ["swift", str(swift_script), tmp_path]
+                if cmd:
+                    res = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+                    if res.returncode == 0 and res.stdout.strip():
+                        return res.stdout.strip()
+            finally:
+                Path(tmp_path).unlink(missing_ok=True)
+        except Exception:
+            pass
+
+    # 3. Try tesseract CLI if in PATH
+    tess_path = shutil.which("tesseract")
+    if tess_path:
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+                tmp.write(image_data)
+                tmp_path = tmp.name
+            try:
+                res = subprocess.run([tess_path, tmp_path, "stdout"], capture_output=True, text=True, timeout=15)
+                if res.returncode == 0 and res.stdout.strip():
+                    return res.stdout.strip()
+            finally:
+                Path(tmp_path).unlink(missing_ok=True)
+        except Exception:
+            pass
+
+    return ""
+
 def chunk_pdf(file_path: Path, doc_metadata: Dict[str, Any]) -> List[Dict[str, Any]]:
     reader = PdfReader(str(file_path))
     chunks = []
@@ -45,8 +104,28 @@ def chunk_pdf(file_path: Path, doc_metadata: Dict[str, Any]) -> List[Dict[str, A
     for page_idx, page in enumerate(reader.pages):
         text = page.extract_text() or ""
         text = text.strip()
+
+        # If page has no embedded text stream (e.g. scanned PDF), attempt OCR on embedded images
+        if not text and hasattr(page, "images") and len(page.images) > 0:
+            extracted_parts = []
+            for img in page.images:
+                img_text = ocr_image_bytes(img.data)
+                if img_text:
+                    extracted_parts.append(img_text)
+            if extracted_parts:
+                text = "\n\n".join(extracted_parts).strip()
+
+        # If still no text (e.g. OCR unavailable or textless page), fallback to document metadata on first page
         if not text:
-            continue
+            if page_idx == 0:
+                text = (
+                    f"{doc_metadata.get('title', '')}\n"
+                    f"Issued by: {doc_metadata.get('issuer', 'University Administration')}\n"
+                    f"Document ID: {doc_id}\n"
+                    f"Effective From: {doc_metadata.get('effective_from', '')}"
+                )
+            else:
+                continue
 
         page_num = page_idx + 1
 
