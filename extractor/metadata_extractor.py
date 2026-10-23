@@ -106,6 +106,18 @@ class ExtractedMetadata:
     cached_file_path: str
     needs_review: bool
     review_notes: str
+    # Annex B Mandatory Fields
+    authority_level: int = 2
+    doc_type: str = "notice"
+    version: str = "1.0"
+    effective_from: str = ""
+    effective_to: str = ""
+    supersedes: str = ""
+    scope_programmes: str = "ALL"
+    scope_batches: str = "ALL"
+    provenance: str = ""
+    retrieved_on: str = "2026-10-23"
+    synthetic: str = "N"
 
 
 def extract_text_from_pdf(pdf_path: Path, max_pages: int = 3) -> Tuple[str, int]:
@@ -259,6 +271,48 @@ def classify_document(section: str, title: str, text: str) -> str:
     return "General Notice"
 
 
+def infer_authority_level(issuer: str, title: str, text: str) -> int:
+    """Infer Annex A authority level (1 to 5)."""
+    combined = (title + " " + text[:1000]).lower()
+    i_lower = issuer.lower()
+    if any(k in combined for k in ["ordinance", "regulations & scheme", "statute", "academic regulations"]):
+        return 1
+    if any(k in i_lower for k in ["dean academic", "registrar", "controller of examinations", "vice chancellor", "finance"]):
+        return 2
+    if any(k in i_lower for k in ["department of", "head of department", "hod"]):
+        return 3
+    if any(k in combined for k in ["faq", "frequently asked", "handbook"]):
+        return 4
+    return 5
+
+
+def infer_doc_type(category: str, title: str, text: str) -> str:
+    """Infer Annex B document type."""
+    combined = (title + " " + text[:500]).lower()
+    if "ordinance" in combined or "regulation" in combined:
+        return "regulation"
+    if "circular" in combined:
+        return "circular"
+    if "faq" in combined:
+        return "faq"
+    if "handbook" in combined:
+        return "handbook"
+    return "notice"
+
+
+def format_iso_date(date_str: Optional[str]) -> str:
+    """Convert various date formats (DD.MM.YYYY, DD/MM/YYYY) to ISO YYYY-MM-DD."""
+    if not date_str:
+        return ""
+    m = re.search(r'(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})', date_str)
+    if m:
+        d, mo, y = m.group(1), m.group(2), m.group(3)
+        if len(y) == 2:
+            y = "20" + y
+        return f"{int(y):04d}-{int(mo):02d}-{int(d):02d}"
+    return date_str
+
+
 def process_pdf_document(
     pdf_path: Path,
     manifest_record: Dict[str, Any]
@@ -280,6 +334,11 @@ def process_pdf_document(
     deadline_date = extract_deadline_date(text)
     issuing_authority = detect_issuing_authority(text, title)
     category = classify_document(section, title, text)
+
+    # Annex A & B Inferences
+    authority_level = infer_authority_level(issuing_authority, title, text)
+    doc_type = infer_doc_type(category, title, text)
+    effective_from = format_iso_date(published_date)
 
     # 3. Determine Review Flag (Auto-extract + Manual Review)
     review_reasons = []
@@ -309,5 +368,16 @@ def process_pdf_document(
         source_url=source_url,
         cached_file_path=str(pdf_path),
         needs_review=needs_review,
-        review_notes=review_notes
+        review_notes=review_notes,
+        authority_level=authority_level,
+        doc_type=doc_type,
+        version="1.0",
+        effective_from=effective_from,
+        effective_to="",
+        supersedes="",
+        scope_programmes="ALL",
+        scope_batches="ALL",
+        provenance=source_url,
+        retrieved_on=manifest_record.get("download_timestamp", "2026-10-23")[:10],
+        synthetic="N"
     )

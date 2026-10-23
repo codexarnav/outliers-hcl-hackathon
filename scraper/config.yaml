@@ -26,6 +26,11 @@ sections:
     container_selector: "#tab3"
     item_selector: "li"
     archive_url: "http://www.dtu.ac.in/Web/Archive/archive-tenders.php"
+  academics:
+    url: "http://dtu.ac.in/Web/Academics/ordinance.php"
+    container_selector: "body"
+    item_selector: "a"
+    archive_url: "http://dtu.ac.in/Web/Academics/ordinance.php"
 
 # HTTP behaviour
 user_agent: "DTU-Hackathon-Scraper/1.0 (student project)"

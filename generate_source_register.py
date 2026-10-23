@@ -78,16 +78,29 @@ def generate_source_register(
         meta = process_pdf_document(pdf_path, rec)
         extracted_rows.append(meta)
 
-    # Write CSV
+    # Write CSV with Annex B Mandatory Fields
     fieldnames = [
+        # Annex B Mandatory Fields
         "doc_id",
+        "title",
+        "issuer",
+        "authority_level",
+        "doc_type",
+        "version",
+        "effective_from",
+        "effective_to",
+        "supersedes",
+        "scope_programmes",
+        "scope_batches",
+        "provenance",
+        "retrieved_on",
+        "synthetic",
+        # Extended Diagnostic Fields
         "section",
         "category",
-        "title",
         "file_number",
         "published_date",
         "deadline_date",
-        "issuing_authority",
         "total_pages",
         "file_size_bytes",
         "needs_review",
@@ -102,13 +115,24 @@ def generate_source_register(
         for r in extracted_rows:
             writer.writerow({
                 "doc_id": r.doc_id,
+                "title": r.title,
+                "issuer": r.issuing_authority,
+                "authority_level": r.authority_level,
+                "doc_type": r.doc_type,
+                "version": r.version,
+                "effective_from": r.effective_from or r.published_date or "",
+                "effective_to": r.effective_to,
+                "supersedes": r.supersedes,
+                "scope_programmes": r.scope_programmes,
+                "scope_batches": r.scope_batches,
+                "provenance": r.provenance or r.source_url,
+                "retrieved_on": r.retrieved_on,
+                "synthetic": r.synthetic,
                 "section": r.section,
                 "category": r.category,
-                "title": r.title,
                 "file_number": r.file_number or "",
                 "published_date": r.published_date or "",
                 "deadline_date": r.deadline_date or "",
-                "issuing_authority": r.issuing_authority,
                 "total_pages": r.total_pages,
                 "file_size_bytes": r.file_size_bytes,
                 "needs_review": r.needs_review,
