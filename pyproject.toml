@@ -16,6 +16,9 @@ dependencies = [
     "sentence-transformers>=2.5.0",
     "pypdf>=4.1.0",
     "pdfplumber>=0.11.0",
+    "reportlab>=4.1.0",
+    "beautifulsoup4>=4.12.0",
+    "pyyaml>=6.0.1",
     "streamlit>=1.32.0",
     "httpx>=0.27.0",
     "python-dotenv>=1.0.1",
@@ -31,3 +34,7 @@ dev = [
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "extractor*", "scraper*", "graph*", "api*", "ui*"]
