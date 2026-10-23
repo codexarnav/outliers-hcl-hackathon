@@ -171,6 +171,16 @@
     - Integrated `sql/derived_features.sql` with deterministic SQL views (`v_attendance_pct`, `v_attendance_status`, `v_marks_gap`, `v_student_overview`).
     - Validated by both `scripts/validate_students.py` and `scripts/validate_data.py` (0 errors, 0 warnings).
     - Annex E Data Card (`docs/DATA_CARD.md`) fully updated.
+  - **Greptile Code Review on PR #2 Addressed (All 13 findings resolved):**
+    - `scripts/load_students.py`: Replaced `INSERT OR REPLACE` with `ON CONFLICT DO UPDATE` based on primary keys to prevent `ON DELETE CASCADE` deleting dependent child records during single-table reloads.
+    - `scripts/load_students.py`: Wrapped directory loads in a single atomic database transaction (`with conn:`) to prevent partial commits on failure.
+    - `scripts/validate_students.py`: Added checks for all required columns per table, positive `max_marks`, non-negative score components, `exam_type` validity, and proportional pass mark checking `(total / max_marks) * 100 >= 40.0%`.
+    - `sql/derived_features.sql`: Fixed `classes_short_by` formula in `v_attendance_status` to account for growing total classes held (`ceil((T*held - attended)/(1 - T))`).
+    - `sql/derived_features.sql`: Added `COALESCE` fallbacks for `min_pass_total_pct` and `placement_min_cgpa` in `v_marks_gap` and `v_placement_eligible`.
+    - `sql/derived_features.sql`: Updated `v_latest_attempt` to sort session attempts chronologically by session year/month before exam type.
+    - `scripts/validate_data.py`: Added `"MAKEUP"` to `VALID_EXAM_TYPES`, resolved active rules per-student, and sorted attempts chronologically.
+    - `data/test_students/results.csv` & `synthetic_student_dataset.json`: Preserved `S1003` regular internal marks at 13 in the supplementary attempt.
+    - `scripts/generate_students.py`: Updated to export and synchronize the complete 60-student dataset and edge-case manifest.
 - [x] **PR #3 Created & Updated:** `feat/hybrid-retrieval-precedence` (PR #3: https://github.com/codexarnav/outliers-hcl-hackathon/pull/3)
   - Section-aware hierarchical chunking (`core/chunking.py`) extracting chunks across DTU ordinances and circulars.
   - Hybrid retrieval engine (`core/retrieval.py`): SQLite FTS5 BM25 sparse search + ChromaDB dense search + Reciprocal Rank Fusion (RRF) + exact-phrase boost.
