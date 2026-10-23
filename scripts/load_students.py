@@ -20,6 +20,13 @@ if str(ROOT_DIR) not in sys.path:
 
 from core.database import get_connection, init_db
 
+TABLE_PRIMARY_KEYS = {
+    "students": ["student_id"],
+    "courses": ["course_code"],
+    "attendance": ["student_id", "course_code"],
+    "results": ["student_id", "course_code", "exam_session", "exam_type"],
+}
+
 def load_table_from_csv(conn: sqlite3.Connection, csv_path: Path, table_name: str) -> int:
     if not csv_path.exists():
         print(f"[SKIP] File not found: {csv_path}")
@@ -36,7 +43,20 @@ def load_table_from_csv(conn: sqlite3.Connection, csv_path: Path, table_name: st
     columns = list(rows[0].keys())
     placeholders = ", ".join(["?"] * len(columns))
     col_names = ", ".join(columns)
-    sql = f"INSERT OR REPLACE INTO {table_name} ({col_names}) VALUES ({placeholders})"
+
+    # Use INSERT ... ON CONFLICT DO UPDATE SET to preserve existing parent rows
+    # and avoid triggering ON DELETE CASCADE on child tables (Greptile Finding #5)
+    pk_cols = TABLE_PRIMARY_KEYS.get(table_name)
+    if pk_cols and all(pk in columns for pk in pk_cols):
+        pk_str = ", ".join(pk_cols)
+        non_pk_cols = [c for c in columns if c not in pk_cols]
+        if non_pk_cols:
+            update_clause = ", ".join([f"{c} = excluded.{c}" for c in non_pk_cols])
+            sql = f"INSERT INTO {table_name} ({col_names}) VALUES ({placeholders}) ON CONFLICT ({pk_str}) DO UPDATE SET {update_clause}"
+        else:
+            sql = f"INSERT INTO {table_name} ({col_names}) VALUES ({placeholders}) ON CONFLICT ({pk_str}) DO NOTHING"
+    else:
+        sql = f"INSERT OR REPLACE INTO {table_name} ({col_names}) VALUES ({placeholders})"
 
     count = 0
     with conn:

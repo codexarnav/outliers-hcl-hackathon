@@ -27,11 +27,12 @@ COPY eval/ ./eval/
 COPY data/ ./data/
 COPY main.py ./
 
-# Pre-initialize SQLite and Chroma index
+# Pre-initialize SQLite, students, and document search indexes (Finding #6)
 ENV PYTHONPATH=/app
 ENV MOCK_LLM=true
 RUN python -c "from core.database import init_db; init_db()" && \
-    python scripts/load_students.py --dir data/test_students/
+    python scripts/load_students.py --dir data/test_students/ && \
+    python -c "from core.chunking import chunk_all_documents; from core.retrieval import index_chunks; index_chunks(chunk_all_documents())"
 
 EXPOSE 8000 8501
 

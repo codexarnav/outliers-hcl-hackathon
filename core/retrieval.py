@@ -53,9 +53,40 @@ def init_fts_table(conn: sqlite3.Connection):
         );
         """)
 
-def index_chunks(chunks: List[Dict[str, Any]]):
+def delete_document_chunks(doc_id: str) -> None:
+    """
+    Deletes all chunks for a given doc_id from both SQLite FTS5 and ChromaDB (Finding #19).
+    Prevents orphaned clauses when documents are replaced or updated.
+    """
+    if not doc_id:
+        return
+
+    # Delete from SQLite FTS5
+    conn = get_connection()
+    try:
+        init_fts_table(conn)
+        with conn:
+            conn.execute("DELETE FROM chunks_fts WHERE doc_id = ?", (doc_id,))
+    except Exception as e:
+        print(f"[WARN] Failed to delete FTS5 chunks for doc_id '{doc_id}': {e}")
+    finally:
+        conn.close()
+
+    # Delete from ChromaDB
+    try:
+        col = get_chroma_collection()
+        col.delete(where={"doc_id": doc_id})
+    except Exception as e:
+        print(f"[WARN] Failed to delete Chroma chunks for doc_id '{doc_id}': {e}")
+
+def index_chunks(chunks: List[Dict[str, Any]]) -> int:
     if not chunks:
         return 0
+
+    # Finding #19: Purge old chunks for all documents being re-indexed
+    distinct_docs = set(c["doc_id"] for c in chunks if c.get("doc_id"))
+    for d_id in distinct_docs:
+        delete_document_chunks(d_id)
 
     conn = get_connection()
     init_fts_table(conn)
@@ -63,8 +94,6 @@ def index_chunks(chunks: List[Dict[str, Any]]):
     # 1. Index into SQLite FTS5
     with conn:
         for c in chunks:
-            # Delete existing if updating
-            conn.execute("DELETE FROM chunks_fts WHERE chunk_id = ?", (c["chunk_id"],))
             conn.execute("""
             INSERT INTO chunks_fts (
                 chunk_id, doc_id, title, section, page, text,

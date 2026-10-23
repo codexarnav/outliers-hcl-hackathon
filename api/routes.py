@@ -9,6 +9,7 @@ FastAPI Routes implementing Section 6 Contract
 """
 
 import os
+import re
 import csv
 import json
 import sqlite3
@@ -57,11 +58,13 @@ def ask_question(
 @router.post("/ingest", response_model=IngestResponse)
 async def ingest_document(
     file: UploadFile = File(...),
-    metadata: str = Form(..., description="JSON string matching Annex B Source Register schema")
+    metadata: str = Form(..., description="JSON string matching Annex B Source Register schema"),
+    x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key")
 ):
     """
     Live Document Ingestion Endpoint (R11).
     Accepts PDF/TXT file and Annex B metadata. Indexes into ChromaDB & SQLite FTS5 immediately.
+    Guarded against path traversal (Finding #1) and unauthorized policy overwrite (Finding #2).
     """
     try:
         meta_dict = json.loads(metadata)
@@ -74,28 +77,60 @@ async def ingest_document(
         if f not in meta_dict:
             raise HTTPException(status_code=400, detail=f"Missing required metadata field: '{f}'")
 
-    doc_id = meta_dict["doc_id"]
-    os.makedirs(DOCUMENTS_DIR, exist_ok=True)
+    doc_id = str(meta_dict["doc_id"]).strip()
 
-    # Determine file extension
-    file_ext = Path(file.filename).suffix.lower()
-    if file_ext not in (".pdf", ".txt"):
+    # Finding #1: Path traversal validation
+    if not doc_id or not re.match(r"^[a-zA-Z0-9_\-\.]+$", doc_id) or ".." in doc_id or "/" in doc_id or "\\" in doc_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid doc_id: must contain only alphanumeric characters, dots, dashes, and underscores without path traversal characters."
+        )
+
+    # Determine file extension safely
+    orig_ext = Path(file.filename or "").suffix.lower()
+    if orig_ext not in (".pdf", ".txt"):
         file_ext = ".pdf"
+    else:
+        file_ext = orig_ext
 
-    save_path = DOCUMENTS_DIR / f"{doc_id}{file_ext}"
+    os.makedirs(DOCUMENTS_DIR, exist_ok=True)
+    save_path = (DOCUMENTS_DIR / f"{doc_id}{file_ext}").resolve()
+    if not str(save_path).startswith(str(DOCUMENTS_DIR.resolve())):
+        raise HTTPException(status_code=400, detail="Invalid doc_id: destination path escapes documents directory.")
 
-    # Save uploaded file
-    contents = await file.read()
-    with open(save_path, "wb") as f:
-        f.write(contents)
+    # Finding #2: Guard against unauthorized policy replacement
+    is_admin = bool(x_admin_key and x_admin_key == settings.ADMIN_API_KEY)
+    auth_level = int(meta_dict.get("authority_level", 1))
+    synthetic = str(meta_dict.get("synthetic", "N")).strip().upper()
 
-    # Append to source_register.csv if not already present
+    # Check existing register rows
     os.makedirs(SOURCE_REGISTER_PATH.parent, exist_ok=True)
     existing_rows = []
     if SOURCE_REGISTER_PATH.exists():
         with open(SOURCE_REGISTER_PATH, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             existing_rows = list(reader)
+
+    existing_doc = next((r for r in existing_rows if r.get("doc_id") == doc_id), None)
+    if existing_doc and not is_admin:
+        # Prevent non-admin callers from overwriting official/trusted documents
+        if existing_doc.get("synthetic", "N").upper() != "Y" or int(existing_doc.get("authority_level", 1)) == 1:
+            raise HTTPException(
+                status_code=403,
+                detail="Admin authorization (X-Admin-Key) required to overwrite authoritative university documents."
+            )
+
+    # If publishing an authoritative document (authority_level < 2 or non-synthetic), require admin key
+    if (auth_level < 2 or synthetic != "Y") and not is_admin:
+        raise HTTPException(
+            status_code=401,
+            detail="Admin authorization (X-Admin-Key) required to publish authoritative university regulations."
+        )
+
+    # Save uploaded file
+    contents = await file.read()
+    with open(save_path, "wb") as f:
+        f.write(contents)
 
     # Check if doc_id exists; replace or append
     headers = [
@@ -176,8 +211,15 @@ def health_check():
     }
 
 @router.get("/audit/{trace_id}", response_model=AuditRecordResponse)
-def get_audit_record(trace_id: str):
-    """Retrieves full audit log entry matching Annex D format."""
+def get_audit_record(
+    trace_id: str,
+    x_student_id: Optional[str] = Header(None, alias="X-Student-Id"),
+    x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key")
+):
+    """
+    Retrieves full audit log entry matching Annex D format.
+    Protected: Restricts access to personal student records to matching student or admin (Finding #3).
+    """
     conn = get_connection()
     try:
         cur = conn.execute("SELECT * FROM audit_log WHERE trace_id = ?", (trace_id,))
@@ -186,6 +228,16 @@ def get_audit_record(trace_id: str):
             raise HTTPException(status_code=404, detail=f"Audit trace '{trace_id}' not found.")
 
         d = dict(row)
+        trace_sid = d.get("student_id")
+        if trace_sid:
+            is_admin = bool(x_admin_key and x_admin_key == settings.ADMIN_API_KEY)
+            is_owner = bool(x_student_id and x_student_id.strip().upper() == trace_sid.strip().upper())
+            if not is_admin and not is_owner:
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Access forbidden: You do not have permission to access audit records for student '{trace_sid}'."
+                )
+
         return {
             "trace_id": d["trace_id"],
             "timestamp": d["timestamp"],
@@ -242,11 +294,16 @@ def get_source_register():
 
 @router.post("/admin/load-students")
 def admin_load_students(
-    directory: Optional[str] = Query(None, description="Directory containing student CSVs")
+    directory: Optional[str] = Query(None, description="Directory containing student CSVs"),
+    x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key")
 ):
     """
     Admin Endpoint for Loading Judge Test Data (Section 4.2).
+    Guarded with X-Admin-Key to prevent unauthorized student resets (Finding #4).
     """
+    if not x_admin_key or x_admin_key != settings.ADMIN_API_KEY:
+        raise HTTPException(status_code=403, detail="Forbidden: Admin authorization required (X-Admin-Key).")
+
     target_dir = Path(directory) if directory else Path("data/test_students")
     if not target_dir.exists():
         raise HTTPException(status_code=400, detail=f"Directory '{target_dir}' does not exist.")

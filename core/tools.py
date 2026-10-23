@@ -5,6 +5,7 @@ over SQLite tables and the rule_registry. No LLM arithmetic or hallucinated thre
 """
 
 import sys
+import re
 import sqlite3
 from datetime import datetime
 from pathlib import Path
@@ -16,6 +17,35 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from core.database import get_connection
+
+MONTH_ORDER = {
+    "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6,
+    "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12,
+    "SPRING": 5, "SUMMER": 7, "AUTUMN": 11, "WINTER": 12, "FALL": 11, "MONSOON": 8
+}
+EXAM_TYPE_ORDER = {
+    "REGULAR": 1,
+    "MAKEUP": 2,
+    "SUPPLEMENTARY": 3
+}
+
+def session_sort_key(session_str: str, exam_type: str = "REGULAR") -> tuple:
+    """
+    Parses exam_session (e.g. '2024-MAY') and exam_type chronologically (Finding #17).
+    Returns (year, month_num, type_priority).
+    """
+    parts = str(session_str).upper().replace("_", "-").split("-")
+    year = 2000
+    month = 0
+    for p in parts:
+        if p.isdigit() and len(p) == 4:
+            year = int(p)
+        elif p.isdigit():
+            month = int(p)
+        elif p in MONTH_ORDER:
+            month = MONTH_ORDER[p]
+    type_priority = EXAM_TYPE_ORDER.get(str(exam_type).upper(), 0)
+    return (year, month, type_priority)
 
 def get_active_rule(
     parameter: str,
@@ -55,7 +85,8 @@ def get_active_rule(
             if p_match and b_match:
                 return r
 
-        return rows[0]
+        # Finding #22: Return None if no rule matches scope rather than applying an out-of-scope rule
+        return None
     finally:
         conn.close()
 
@@ -208,7 +239,17 @@ def check_exam_eligibility(
     # 1. Fetch mandatory minimum attendance rule
     min_rule = get_active_rule("min_attendance_pct", as_of_date)
     if not min_rule:
-        return {"status": "error", "error": "Active attendance threshold rule not found in registry."}
+        return {
+            "status": "no_active_policy",
+            "result": "NO_ACTIVE_POLICY",
+            "student_id": student_id,
+            "course_code": course_code.upper(),
+            "course_name": course_name,
+            "attendance_pct": attendance_pct,
+            "as_of_date": as_of_date,
+            "applied_rules": [],
+            "explanation": f"As of {as_of_date}, no university attendance regulation is in effect."
+        }
 
     min_threshold = float(min_rule["value"])
 
@@ -335,30 +376,47 @@ def compute_cws_attendance_marks(
 
     tier_rules = get_all_active_rules_for_param("cws_attendance_tier", as_of_date)
     
-    # Map tier rules
-    rule_map = {r["rule_id"]: r for r in tier_rules}
-    
+    # Finding #21: If no tier rules are active as of this date, abstain and report no active policy
+    if not tier_rules:
+        return {
+            "status": "no_active_policy",
+            "student_id": student_id,
+            "course_code": course_code.upper(),
+            "course_name": course_name,
+            "attendance_pct": pct,
+            "awarded_marks": None,
+            "applied_rules": [],
+            "explanation": f"As of {as_of_date}, no Continuous Work Assessment (CWS) attendance marks tier policy is in effect in university circulars."
+        }
+
+    # Dynamically parse tier thresholds from active rules in rule_registry
+    parsed_tiers = []
+    for r in tier_rules:
+        val_str = r.get("value", "")
+        parts = [float(x.strip()) for x in val_str.split(",") if x.strip()]
+        if len(parts) >= 2:
+            low, high = min(parts), max(parts)
+        elif len(parts) == 1:
+            low, high = parts[0], 100.0
+        else:
+            continue
+        marks_match = re.search(r"\d+", r["rule_id"])
+        marks = int(marks_match.group(0)) if marks_match else 0
+        parsed_tiers.append((low, high, marks, r))
+
+    parsed_tiers.sort(key=lambda x: x[0], reverse=True)
+
     awarded_marks = 0
     matched_rule = None
-
-    if pct >= 96.0:
-        awarded_marks = 5
-        matched_rule = rule_map.get("CWS-ATT-5")
-    elif pct >= 91.0:
-        awarded_marks = 4
-        matched_rule = rule_map.get("CWS-ATT-4")
-    elif pct >= 86.0:
-        awarded_marks = 3
-        matched_rule = rule_map.get("CWS-ATT-3")
-    elif pct >= 81.0:
-        awarded_marks = 2
-        matched_rule = rule_map.get("CWS-ATT-2")
-    elif pct >= 76.0:
-        awarded_marks = 1
-        matched_rule = rule_map.get("CWS-ATT-1")
-    else:
-        awarded_marks = 0
-        matched_rule = None
+    for low, high, marks, r in parsed_tiers:
+        if low <= pct <= high:
+            awarded_marks = marks
+            matched_rule = r
+            break
+        elif pct > high and marks == parsed_tiers[0][2]:
+            awarded_marks = marks
+            matched_rule = r
+            break
 
     applied_rules = []
     if matched_rule:
@@ -415,25 +473,43 @@ def get_academic_summary(student_id: str) -> Dict[str, Any]:
             FROM results r
             JOIN courses c ON r.course_code = c.course_code
             WHERE r.student_id = ?
-            ORDER BY r.exam_session ASC, r.course_code ASC
         """, (student_id,))
-        results = [dict(row) for row in r_cur.fetchall()]
+        raw_results = [dict(row) for row in r_cur.fetchall()]
 
-        # Compute earned credits and status breakdown
+        # Sort all historical results chronologically (Finding #17)
+        results = sorted(raw_results, key=lambda x: session_sort_key(x["exam_session"], x["exam_type"]))
+
+        # Group attempts by course to prevent retakes from distorting summaries (Finding #16)
+        course_attempts: Dict[str, List[Dict[str, Any]]] = {}
+        for r in results:
+            cc = r["course_code"]
+            if cc not in course_attempts:
+                course_attempts[cc] = []
+            course_attempts[cc].append(r)
+
         earned_credits = 0
         backlog_courses = []
         passed_courses = []
 
-        for r in results:
-            if r["result"] == "PASS":
-                earned_credits += r["credits"]
-                passed_courses.append(r["course_code"])
+        for cc, attempts in course_attempts.items():
+            # Latest attempt chronologically
+            latest = attempts[-1]
+            # Has the student ever passed this course?
+            pass_attempt = next((a for a in attempts if a["result"] == "PASS"), None)
+
+            if pass_attempt or latest["result"] == "PASS":
+                # Course is cleared: add credits once
+                earned_credits += latest["credits"]
+                passed_courses.append(cc)
             else:
+                # Course remains an active backlog
                 backlog_courses.append({
-                    "course_code": r["course_code"],
-                    "course_name": r["course_name"],
-                    "status": r["result"],
-                    "total_marks": r["total_marks"]
+                    "course_code": cc,
+                    "course_name": latest["course_name"],
+                    "status": latest["result"],
+                    "total_marks": latest["total_marks"],
+                    "exam_session": latest["exam_session"],
+                    "exam_type": latest["exam_type"]
                 })
 
         return {
@@ -486,18 +562,32 @@ def check_promotion_eligibility(
             target_semester = current_sem + 1
 
         promo_rule = get_active_rule("max_backlogs_promotion", as_of_date, programme=programme)
-        max_allowed = int(promo_rule["value"]) if promo_rule else 4
 
-        applied_rules = []
-        if promo_rule:
-            applied_rules.append({
-                "rule_id": promo_rule["rule_id"],
-                "parameter": promo_rule["parameter"],
-                "operator": promo_rule["operator"],
-                "value": promo_rule["value"],
-                "source_doc_id": promo_rule["source_doc_id"],
-                "source_section": promo_rule["source_section"]
-            })
+        # Finding #15: Guard against None when as_of_date is before rule's effective date
+        if not promo_rule:
+            return {
+                "status": "no_active_policy",
+                "result": "NO_ACTIVE_POLICY",
+                "student_id": student_id,
+                "current_semester": current_sem,
+                "target_semester": target_semester,
+                "active_backlogs": active_backlogs,
+                "max_allowed_backlogs": None,
+                "applied_rules": [],
+                "explanation": f"As of {as_of_date}, no promotion regulations are in effect.",
+                "as_of_date": as_of_date
+            }
+
+        max_allowed = int(promo_rule["value"])
+
+        applied_rules = [{
+            "rule_id": promo_rule["rule_id"],
+            "parameter": promo_rule["parameter"],
+            "operator": promo_rule["operator"],
+            "value": promo_rule["value"],
+            "source_doc_id": promo_rule["source_doc_id"],
+            "source_section": promo_rule["source_section"]
+        }]
 
         # Criteria for entering 3rd year (5th semester) or beyond
         if target_semester >= 5:
@@ -514,6 +604,42 @@ def check_promotion_eligibility(
                     f"You have {active_backlogs} active backlog(s), which exceeds the maximum threshold of {max_allowed} "
                     f"permissible under {promo_rule['source_section']} ({promo_rule['source_doc_id']}). "
                     f"You are not eligible for promotion to semester {target_semester} until you clear surplus backlogs."
+                )
+        elif target_semester == 3:
+            # Finding #14: Enforce >= 50% 1st year credits earned per Clause R.1(B).15
+            c_cur = conn.execute("""
+                SELECT SUM(credits) as total_creds
+                FROM courses
+                WHERE semester IN (1, 2)
+                  AND (programme = ? OR programme = 'ALL')
+            """, (programme,))
+            c_row = c_cur.fetchone()
+            prescribed_creds = c_row["total_creds"] if c_row and c_row["total_creds"] else 0
+
+            e_cur = conn.execute("""
+                SELECT DISTINCT c.course_code, c.credits
+                FROM results r
+                JOIN courses c ON r.course_code = c.course_code
+                WHERE r.student_id = ?
+                  AND r.result = 'PASS'
+                  AND c.semester IN (1, 2)
+            """, (student_id,))
+            earned_1st_year = sum(row["credits"] for row in e_cur.fetchall())
+            req_creds = 0.5 * prescribed_creds if prescribed_creds > 0 else 0
+
+            if prescribed_creds > 0 and earned_1st_year < req_creds:
+                result = "NOT_ELIGIBLE"
+                explanation = (
+                    f"You have earned {earned_1st_year} credits out of {prescribed_creds} prescribed credits "
+                    f"for Year 1 ({round(earned_1st_year / prescribed_creds * 100, 1)}%), which is below the "
+                    f"mandatory 50% minimum threshold under {promo_rule['source_section']} ({promo_rule['source_doc_id']}). "
+                    f"You are not eligible for promotion to semester 3."
+                )
+            else:
+                result = "ELIGIBLE"
+                explanation = (
+                    f"You have satisfied the 1st year credit requirements under {promo_rule['source_section']} "
+                    f"({promo_rule['source_doc_id']}) and are eligible for registration and promotion to semester 3."
                 )
         else:
             # Regular semester advancement
@@ -568,14 +694,17 @@ def check_supplementary_eligibility(
             FROM results r
             JOIN courses c ON r.course_code = c.course_code
             WHERE r.student_id = ? AND UPPER(r.course_code) = ?
-            ORDER BY r.exam_session DESC
         """, (student_id, course_code.strip().upper()))
-        row = cur.fetchone()
-        if not row:
+        all_attempts = [dict(r) for r in cur.fetchall()]
+        if not all_attempts:
             return {
                 "status": "error",
                 "error": f"No examination record found for student '{student_id}' in course '{course_code}'."
             }
+
+        # Finding #17: Chronological sort with session_sort_key and attempt tie-breaker
+        sorted_attempts = sorted(all_attempts, key=lambda x: session_sort_key(x["exam_session"], x["exam_type"]))
+        row = sorted_attempts[-1]
 
         prev_result = row["result"]
         course_name = row["course_name"]
@@ -583,16 +712,29 @@ def check_supplementary_eligibility(
         supp_rule = get_active_rule("supplementary_eligible_grade", as_of_date)
         detain_rule = get_active_rule("supplementary_prohibited_status", as_of_date)
 
-        applied_rules = []
-        if supp_rule:
-            applied_rules.append({
-                "rule_id": supp_rule["rule_id"],
-                "parameter": supp_rule["parameter"],
-                "operator": supp_rule["operator"],
-                "value": supp_rule["value"],
-                "source_doc_id": supp_rule["source_doc_id"],
-                "source_section": supp_rule["source_section"]
-            })
+        # Finding #15: Guard against None when as_of_date is before rule's effective date
+        if not supp_rule:
+            return {
+                "status": "no_active_policy",
+                "result": "NO_ACTIVE_POLICY",
+                "student_id": student_id,
+                "course_code": course_code.upper(),
+                "course_name": course_name,
+                "prior_result": prev_result,
+                "prior_total_marks": row["total_marks"],
+                "applied_rules": [],
+                "explanation": f"As of {as_of_date}, no supplementary examination regulations are in effect.",
+                "as_of_date": as_of_date
+            }
+
+        applied_rules = [{
+            "rule_id": supp_rule["rule_id"],
+            "parameter": supp_rule["parameter"],
+            "operator": supp_rule["operator"],
+            "value": supp_rule["value"],
+            "source_doc_id": supp_rule["source_doc_id"],
+            "source_section": supp_rule["source_section"]
+        }]
         if detain_rule:
             applied_rules.append({
                 "rule_id": detain_rule["rule_id"],
@@ -618,9 +760,11 @@ def check_supplementary_eligibility(
             )
         elif prev_result == "DETAINED":
             result = "NOT_ELIGIBLE"
+            detain_doc = detain_rule['source_doc_id'] if detain_rule else "University Ordinance"
+            detain_sec = detain_rule['source_section'] if detain_rule else "Clause R.1(B)"
             explanation = (
                 f"You were 'DETAINED' in {course_code.upper()} ({course_name}) due to attendance shortage. "
-                f"Under {detain_rule['source_doc_id']} {detain_rule['source_section']}, detained students are strictly barred "
+                f"Under {detain_doc} {detain_sec}, detained students are strictly barred "
                 f"from supplementary examinations and must repeat the entire course in a regular semester."
             )
         else:  # PASS
@@ -704,34 +848,49 @@ def evaluate_what_if_supplementary(
     if place_backlog_rule:
         applied_rules.append(place_backlog_rule)
 
-    assumptions = [
-        f"Assumption 1: Student appears in supplementary examination for {course_code.upper()} and scores {anticipated_total_marks}/100, which satisfies the {min_pass}% passing threshold (DTU-ORD-2024 Clause R.1(B).18).",
-        f"Assumption 2: Clearing this course reduces active backlogs by 1 (from {current_backlogs} to {max(0, current_backlogs - 1)}).",
-        f"Assumption 3: Campus placement registration requires CGPA >= {required_cgpa} and active backlogs <= {max_place_backlogs} (DTU-ORD-2024 Clause R.1(B).28)."
-    ]
-
-    simulated_backlogs = max(0, current_backlogs - 1)
-    is_placement_eligible = (simulated_backlogs <= max_place_backlogs) and (current_cgpa >= required_cgpa)
-
-    if is_placement_eligible:
-        outcome = "ELIGIBLE_FOR_PLACEMENT"
+    # Finding #18: Check whether anticipated_total_marks meets min_pass standard
+    if anticipated_total_marks < min_pass:
+        simulated_backlogs = current_backlogs
+        outcome = "NOT_ELIGIBLE_FOR_PLACEMENT"
+        assumptions = [
+            f"Assumption 1: Student appears in supplementary examination for {course_code.upper()} and scores {anticipated_total_marks}/100, which is BELOW the minimum passing threshold of {min_pass}% (DTU-ORD-2024 Clause R.1(B).18).",
+            f"Assumption 2: Since the examination is failed, active backlogs remain unchanged at {current_backlogs}.",
+            f"Assumption 3: Campus placement registration requires CGPA >= {required_cgpa} and active backlogs <= {max_place_backlogs} (DTU-ORD-2024 Clause R.1(B).28)."
+        ]
         conclusion = (
-            f"Yes, if you pass the supplementary examination in {course_code.upper()}, your active backlogs "
-            f"will drop from {current_backlogs} to {simulated_backlogs}. Since your CGPA is {current_cgpa} "
-            f"(>= {required_cgpa} cut-off) and you will have {simulated_backlogs} backlogs, you WILL BE ELIGIBLE "
-            f"for campus placement drives under DTU Placement Guidelines."
+            f"If you score {anticipated_total_marks}/100 in the supplementary examination for {course_code.upper()}, "
+            f"you will NOT clear the course because the minimum passing standard is {min_pass}%. "
+            f"Your active backlogs will remain at {current_backlogs}, and you WILL NOT BE ELIGIBLE for campus placement drives."
         )
     else:
-        outcome = "NOT_ELIGIBLE_FOR_PLACEMENT"
-        reasons = []
-        if simulated_backlogs > max_place_backlogs:
-            reasons.append(f"you will still have {simulated_backlogs} remaining active backlogs (placement requires 0)")
-        if current_cgpa < required_cgpa:
-            reasons.append(f"your CGPA is {current_cgpa}, which is below the placement threshold of {required_cgpa}")
-        conclusion = (
-            f"Even if you pass the supplementary examination in {course_code.upper()}, you WILL NOT be eligible "
-            f"for campus placement because {' and '.join(reasons)}."
-        )
+        assumptions = [
+            f"Assumption 1: Student appears in supplementary examination for {course_code.upper()} and scores {anticipated_total_marks}/100, which satisfies the {min_pass}% passing threshold (DTU-ORD-2024 Clause R.1(B).18).",
+            f"Assumption 2: Clearing this course reduces active backlogs by 1 (from {current_backlogs} to {max(0, current_backlogs - 1)}).",
+            f"Assumption 3: Campus placement registration requires CGPA >= {required_cgpa} and active backlogs <= {max_place_backlogs} (DTU-ORD-2024 Clause R.1(B).28)."
+        ]
+
+        simulated_backlogs = max(0, current_backlogs - 1)
+        is_placement_eligible = (simulated_backlogs <= max_place_backlogs) and (current_cgpa >= required_cgpa)
+
+        if is_placement_eligible:
+            outcome = "ELIGIBLE_FOR_PLACEMENT"
+            conclusion = (
+                f"Yes, if you pass the supplementary examination in {course_code.upper()}, your active backlogs "
+                f"will drop from {current_backlogs} to {simulated_backlogs}. Since your CGPA is {current_cgpa} "
+                f"(>= {required_cgpa} cut-off) and you will have {simulated_backlogs} backlogs, you WILL BE ELIGIBLE "
+                f"for campus placement drives under DTU Placement Guidelines."
+            )
+        else:
+            outcome = "NOT_ELIGIBLE_FOR_PLACEMENT"
+            reasons = []
+            if simulated_backlogs > max_place_backlogs:
+                reasons.append(f"you will still have {simulated_backlogs} remaining active backlogs (placement requires 0)")
+            if current_cgpa < required_cgpa:
+                reasons.append(f"your CGPA is {current_cgpa}, which is below the placement threshold of {required_cgpa}")
+            conclusion = (
+                f"Even if you pass the supplementary examination in {course_code.upper()}, you WILL NOT be eligible "
+                f"for campus placement because {' and '.join(reasons)}."
+            )
 
     return {
         "status": "ok",

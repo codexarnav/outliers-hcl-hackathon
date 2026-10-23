@@ -19,6 +19,7 @@ from graph.nodes import (
     audit_logger_node
 )
 from core.config import settings
+from core.database import get_connection
 
 def route_after_classification(state: AgentState) -> str:
     """Conditional edge router based on intent and authorization."""
@@ -109,6 +110,16 @@ def process_question(
     total_latency_ms = int((time.time() - start_time) * 1000)
     final_state["latency_ms"] = total_latency_ms
 
+    # Finding #28: Update audit_log with actual measured elapsed latency
+    used_trace_id = final_state.get("trace_id", trace_id)
+    try:
+        conn = get_connection()
+        with conn:
+            conn.execute("UPDATE audit_log SET latency_ms = ? WHERE trace_id = ?", (total_latency_ms, used_trace_id))
+        conn.close()
+    except Exception as e:
+        print(f"[WARN] Failed to update audit log latency: {e}")
+
     # Transform applied_rules to Section 6.1 schema
     formatted_rules = []
     for r in final_state.get("applied_rules", []):
@@ -132,6 +143,7 @@ def process_question(
         "answer": final_state.get("answer", ""),
         "answer_type": final_state.get("answer_type", "not_found"),
         "citations": final_state.get("citations", []),
+        "retrieved_chunks": final_state.get("retrieved_chunks", []),
         "tools_invoked": formatted_tools,
         "applied_rules": formatted_rules,
         "conflicts_detected": final_state.get("conflicts_detected", []),

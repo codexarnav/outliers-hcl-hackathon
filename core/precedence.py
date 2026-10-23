@@ -121,7 +121,9 @@ def resolve_precedence(
 
     # Step 2: Explicit Supersession
     # A Level 1 or 2 document can explicitly supersede earlier doc_ids or clauses
-    superseded_ids = set()
+    # Finding #8: Clause-specific supersession must NOT supersede unrelated clauses from the same document
+    superseded_doc_ids = set()
+    superseded_clause_refs = set()
     supersession_reasons = []
 
     def normalize_ref(ref: str) -> str:
@@ -132,30 +134,29 @@ def resolve_precedence(
         if auth in (1, 2) and c.get("supersedes"):
             targets = [t.strip() for t in c["supersedes"].split(";") if t.strip()]
             for target in targets:
-                superseded_ids.add(target.lower())
-                superseded_ids.add(normalize_ref(target))
-                # Also add bare doc_id if target is doc_id#section
                 if "#" in target:
-                    superseded_ids.add(normalize_ref(target.split("#")[0]))
+                    doc_part, sec_part = target.split("#", 1)
+                    superseded_clause_refs.add((normalize_ref(doc_part), normalize_ref(sec_part)))
+                else:
+                    superseded_doc_ids.add(normalize_ref(target))
                 supersession_reasons.append(f"{c.get('doc_id')} explicitly supersedes {target} (step 2)")
 
     surviving = []
     superseded_chunks = []
     for c in applicable:
-        doc_id = c.get("doc_id", "").lower().strip()
-        section = c.get("section", "").lower().strip()
-        full_ref = f"{doc_id}#{section}"
-        norm_ref = normalize_ref(full_ref)
+        doc_id = c.get("doc_id", "").strip()
+        section = c.get("section", "").strip()
         norm_doc = normalize_ref(doc_id)
+        norm_sec = normalize_ref(section)
 
-        is_superseded = (
-            doc_id in superseded_ids or
-            norm_doc in superseded_ids or
-            full_ref in superseded_ids or
-            norm_ref in superseded_ids or
-            any(s in norm_ref for s in superseded_ids if "#" in s)
-        )
-        if is_superseded:
+        is_doc_superseded = norm_doc in superseded_doc_ids
+        is_clause_superseded = False
+        for s_doc, s_sec in superseded_clause_refs:
+            if norm_doc == s_doc and (norm_sec == s_sec or s_sec in norm_sec or norm_sec in s_sec):
+                is_clause_superseded = True
+                break
+
+        if is_doc_superseded or is_clause_superseded:
             superseded_chunks.append(c)
         else:
             surviving.append(c)
@@ -229,6 +230,10 @@ def resolve_precedence(
                 conflicts.append({
                     "doc_a": winner_doc,
                     "doc_b": other.get("doc_id"),
+                    "chunk_a": winner,
+                    "chunk_b": other,
+                    "chunk_1": winner,
+                    "chunk_2": other,
                     "authority_level": winner.get("authority_level"),
                     "effective_from": winner.get("effective_from")
                 })

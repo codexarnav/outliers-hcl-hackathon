@@ -81,8 +81,11 @@ def test_ask_unanswerable_endpoint():
     assert data["answer_type"] == "not_found"
     assert "I could not find this information in the authorised university sources." in data["answer"]
 
+from core.retrieval import delete_document_chunks
+from core.config import settings
+
 def test_audit_endpoint():
-    # First ask a question to create a trace
+    # 1. Anonymous general query trace can be viewed
     ask_res = client.post("/ask", json={"question": "What is the fee for B.Tech?"})
     assert ask_res.status_code == 200
     trace_id = ask_res.json()["trace_id"]
@@ -94,6 +97,23 @@ def test_audit_endpoint():
     assert "question_text" in audit_data
     assert "sources_retrieved" in audit_data
 
+    # 2. Personal query trace is protected against unauthorized access (Finding #3)
+    p_ask_res = client.post("/ask", json={"question": "What is my attendance in CO201?"}, headers={"X-Student-Id": "S1001"})
+    assert p_ask_res.status_code == 200
+    p_trace_id = p_ask_res.json()["trace_id"]
+
+    # Unauthorized access by different student -> 403
+    unauth_audit = client.get(f"/audit/{p_trace_id}", headers={"X-Student-Id": "S1002"})
+    assert unauth_audit.status_code == 403
+
+    # Authorized access by owner student -> 200
+    owner_audit = client.get(f"/audit/{p_trace_id}", headers={"X-Student-Id": "S1001"})
+    assert owner_audit.status_code == 200
+
+    # Authorized access by admin key -> 200
+    admin_audit = client.get(f"/audit/{p_trace_id}", headers={"X-Admin-Key": settings.ADMIN_API_KEY})
+    assert admin_audit.status_code == 200
+
 def test_sources_endpoint():
     res = client.get("/sources")
     assert res.status_code == 200
@@ -102,9 +122,17 @@ def test_sources_endpoint():
     assert any(s["doc_id"] == "DTU-ORD-2024" for s in sources)
 
 def test_admin_load_students():
-    res = client.post("/admin/load-students?directory=data/test_students")
-    assert res.status_code == 200
-    data = res.json()
+    # Finding #4: Unauthenticated admin endpoint calls are forbidden
+    unauth_res = client.post("/admin/load-students?directory=data/test_students")
+    assert unauth_res.status_code == 403
+
+    # Authenticated call with admin key succeeds
+    auth_res = client.post(
+        "/admin/load-students?directory=data/test_students",
+        headers={"X-Admin-Key": settings.ADMIN_API_KEY}
+    )
+    assert auth_res.status_code == 200
+    data = auth_res.json()
     assert data["status"] == "ok"
     assert data["records_loaded"] > 0
 
@@ -142,7 +170,17 @@ def test_live_ingest_and_immediate_retrieval():
         "metadata": json.dumps(metadata)
     }
 
-    # 1. Ingest via POST /ingest
+    # Finding #1: Path traversal attempt is rejected
+    bad_meta = json.dumps({"doc_id": "../../requirements", "title": "Evil", "issuer": "Hacker", "authority_level": 1, "doc_type": "notice", "version": "1.0", "effective_from": "2026-01-01"})
+    bad_res = client.post("/ingest", files=files, data={"metadata": bad_meta})
+    assert bad_res.status_code == 400
+
+    # Finding #2: Authoritative doc upload without admin key is rejected
+    auth_doc_meta = json.dumps({"doc_id": "FAKE-ORD-2026", "title": "Fake Ordinance", "issuer": "Senate", "authority_level": 1, "doc_type": "regulation", "version": "1.0", "effective_from": "2026-01-01", "synthetic": "N"})
+    auth_doc_res = client.post("/ingest", files=files, data={"metadata": auth_doc_meta})
+    assert auth_doc_res.status_code == 401
+
+    # 1. Ingest via POST /ingest (synthetic circular level 2 allowed)
     ingest_res = client.post("/ingest", files=files, data=data)
     assert ingest_res.status_code == 200
     ingest_data = ingest_res.json()
@@ -160,6 +198,9 @@ def test_live_ingest_and_immediate_retrieval():
     assert answer_data["answer_type"] == "retrieved_fact"
     assert any(c["doc_id"] == "DTU-NOTIF-SPORTS-2026" for c in answer_data["citations"])
     assert "15.0%" in answer_data["answer"] or "sports" in answer_data["answer"].lower()
+
+    # Finding #27: Guarantee complete cleanup of DTU-NOTIF-SPORTS-2026 from both FTS5 and ChromaDB
+    delete_document_chunks("DTU-NOTIF-SPORTS-2026")
 
     # Cleanup live test file and register
     test_file_path = Path("data/documents/DTU-NOTIF-SPORTS-2026.txt")

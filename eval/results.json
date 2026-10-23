@@ -2,12 +2,12 @@
   "total_questions": 24,
   "metrics": {
     "answer_correctness_pct": 100.0,
-    "citation_accuracy_pct": 100.0,
+    "citation_accuracy_pct": 95.8,
     "abstention_accuracy_pct": 100.0,
     "tool_result_correctness_pct": 100.0,
     "retrieval_hit_rate_pct": 100.0,
-    "latency_p50_ms": 3,
-    "latency_p95_ms": 73,
+    "latency_p50_ms": 4,
+    "latency_p95_ms": 81,
     "llm_calls_per_question": 0,
     "tokens_per_question": 0
   },
@@ -19,10 +19,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "not_found",
       "expected_answer_type": "not_found",
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "Q02",
@@ -31,10 +31,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "not_found",
       "expected_answer_type": "not_found",
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "Q03",
@@ -43,10 +43,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "not_found",
       "expected_answer_type": "not_found",
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "Q04",
@@ -55,10 +55,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "not_found",
       "expected_answer_type": "not_found",
-      "latency_ms": 80
+      "latency_ms": 83
     },
     {
       "id": "Q05",
@@ -70,7 +70,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 73
+      "latency_ms": 80
     },
     {
       "id": "Q06",
@@ -82,7 +82,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 72
+      "latency_ms": 77
     },
     {
       "id": "Q07",
@@ -94,7 +94,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 73
+      "latency_ms": 77
     },
     {
       "id": "Q08",
@@ -106,7 +106,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 72
+      "latency_ms": 81
     },
     {
       "id": "Q09",
@@ -115,10 +115,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 2
+      "latency_ms": 3
     },
     {
       "id": "Q10",
@@ -127,10 +127,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 3
+      "latency_ms": 4
     },
     {
       "id": "Q11",
@@ -139,10 +139,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 3
+      "latency_ms": 4
     },
     {
       "id": "Q12",
@@ -151,10 +151,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 3
+      "latency_ms": 5
     },
     {
       "id": "Q13",
@@ -163,10 +163,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 2
+      "latency_ms": 3
     },
     {
       "id": "Q14",
@@ -175,10 +175,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 2
+      "latency_ms": 3
     },
     {
       "id": "Q15",
@@ -187,10 +187,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "refused",
       "expected_answer_type": "refused",
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "Q16",
@@ -199,10 +199,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "refused",
       "expected_answer_type": "refused",
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "Q17",
@@ -211,10 +211,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "refused",
       "expected_answer_type": "refused",
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "Q18",
@@ -223,10 +223,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 4
+      "latency_ms": 5
     },
     {
       "id": "Q19",
@@ -235,10 +235,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 2
+      "latency_ms": 4
     },
     {
       "id": "Q20",
@@ -247,10 +247,10 @@
       "citation_correct": true,
       "abstention_correct": true,
       "tool_correct": true,
-      "retrieval_hit": true,
+      "retrieval_hit": null,
       "answer_type": "calculated",
       "expected_answer_type": "calculated",
-      "latency_ms": 2
+      "latency_ms": 3
     },
     {
       "id": "Q21",
@@ -262,19 +262,19 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 72
+      "latency_ms": 79
     },
     {
       "id": "Q22",
       "category": "policy_fact",
       "answer_correct": true,
-      "citation_correct": true,
+      "citation_correct": false,
       "abstention_correct": true,
       "tool_correct": true,
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 72
+      "latency_ms": 76
     },
     {
       "id": "Q23",
@@ -286,7 +286,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 73
+      "latency_ms": 76
     },
     {
       "id": "Q24",
@@ -298,7 +298,7 @@
       "retrieval_hit": true,
       "answer_type": "retrieved_fact",
       "expected_answer_type": "retrieved_fact",
-      "latency_ms": 73
+      "latency_ms": 76
     }
   ]
 }
