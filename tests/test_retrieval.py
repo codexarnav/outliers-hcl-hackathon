@@ -3,7 +3,75 @@ Unit Tests for Retrieval Engine (Sparse FTS5 & Hybrid Search)
 """
 
 import pytest
-from core.retrieval import search_sparse, hybrid_search
+from core.retrieval import search_sparse, hybrid_search, index_chunks, get_connection, init_fts_table
+
+@pytest.fixture(autouse=True)
+def ensure_indexed_corpus():
+    """Ensure test corpus is indexed in SQLite FTS5 for isolated test runs (Comment 7)."""
+    conn = get_connection()
+    init_fts_table(conn)
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM chunks_fts")
+    count = cur.fetchone()[0]
+    conn.close()
+
+    if count == 0:
+        sample_chunks = [
+            {
+                "chunk_id": "DTU-ORD-2024_P18_0",
+                "doc_id": "DTU-ORD-2024",
+                "title": "B.Tech Ordinance 2024",
+                "section": "Clause R.1(B).22",
+                "page": 18,
+                "text": "Every student must maintain a minimum attendance of 75.0% of total classes held to be eligible for End-Term Examinations.",
+                "authority_level": 1,
+                "effective_from": "2024-07-01",
+                "supersedes": "DTU-ORD-2021",
+                "scope_programmes": "ALL",
+                "scope_batches": "2024+",
+                "provenance": "https://dtu.ac.in"
+            },
+            {
+                "chunk_id": "DTU-CIR-ATT-2024_P1_0",
+                "doc_id": "DTU-CIR-ATT-2024",
+                "title": "Circular: Strict Compliance of Attendance Norms",
+                "section": "Section 1",
+                "page": 1,
+                "text": "Mandatory 75% attendance requirement for all courses. Medical condonation threshold up to 10% (down to 65.0%).",
+                "authority_level": 2,
+                "effective_from": "2024-07-15",
+                "scope_programmes": "ALL",
+                "scope_batches": "ALL",
+                "provenance": "https://dtu.ac.in"
+            },
+            {
+                "chunk_id": "DTU-CIR-EXAM-SUPP_P1_0",
+                "doc_id": "DTU-CIR-EXAM-SUPP",
+                "title": "Notification: Guidelines for Supplementary and Make-up Examinations",
+                "section": "Clause R.1(B).23",
+                "page": 1,
+                "text": "Make-up examination for students absent due to certified medical hospitalization or extraordinary grounds.",
+                "authority_level": 2,
+                "effective_from": "2024-08-01",
+                "scope_programmes": "ALL",
+                "scope_batches": "ALL",
+                "provenance": "https://dtu.ac.in"
+            },
+            {
+                "chunk_id": "DTU-NOTIF-FEE-2024_P1_0",
+                "doc_id": "DTU-NOTIF-FEE-2024",
+                "title": "Annual Academic Fee Structure for B.Tech Programmes (2024-25)",
+                "section": "Fee Schedule",
+                "page": 1,
+                "text": "Annual academic tuition fee and facility fee structure for B.Tech students. Total annual fee Rs 2,16,000.",
+                "authority_level": 2,
+                "effective_from": "2024-06-20",
+                "scope_programmes": "ALL",
+                "scope_batches": "ALL",
+                "provenance": "https://dtu.ac.in"
+            }
+        ]
+        index_chunks(sample_chunks)
 
 def test_sparse_fts_attendance_search():
     res = search_sparse("minimum attendance 75%", top_k=5)

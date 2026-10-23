@@ -183,9 +183,20 @@
     - `scripts/generate_students.py`: Updated to export and synchronize the complete 60-student dataset and edge-case manifest.
 - [x] **PR #3 Created & Updated:** `feat/hybrid-retrieval-precedence` (PR #3: https://github.com/codexarnav/outliers-hcl-hackathon/pull/3)
   - Section-aware hierarchical chunking (`core/chunking.py`) extracting chunks across DTU ordinances and circulars.
-  - Hybrid retrieval engine (`core/retrieval.py`): SQLite FTS5 BM25 sparse search + ChromaDB dense search + Reciprocal Rank Fusion (RRF) + exact-phrase boost.
+  - Hybrid retrieval engine (`core/retrieval.py`): SQLite FTS5 BM25 sparse search + ChromaDB dense search + Reciprocal Rank Fusion (RRF) + Cross-Encoder reranker.
   - Annex A Source Precedence Policy engine (`core/precedence.py`): 5-step deterministic resolution, handling applicability, supersession, authority levels (1-5), recency, and cohort ordinance preservation.
-  - Merged PR #2 and PR #1 updates into PR #3; all 32 unit tests passing in ~0.18s!
+  - **Greptile Code Review on PR #3 Addressed (All 10 findings resolved):**
+    - `core/precedence.py`: Normalized section references (`normalize_section_ref`) so `DTU-ORD-2024#Clause R.1(B).22` supersedes chunk section `R.1(B).22`.
+    - `core/precedence.py`: Enforced Level 5 informational restriction (`answer_type: informational_only`, `winning_chunk: None`) to prevent unofficial sources from becoming authoritative winners.
+    - `core/precedence.py`: Refined conflict detection to require genuine contradictory claims rather than flagging equal-level agreeing circulars.
+    - `core/precedence.py`: Fixed general queries (`batch_year="ALL"`) to retain university ordinances instead of dropping scoped rules.
+    - `core/chunking.py`: Captured page text preceding first heading as clause continuation instead of dropping it.
+    - `core/chunking.py`: Preserved page numbers from explicit text page markers instead of naive clause-index counting.
+    - `core/retrieval.py`: Deleted obsolete chunk IDs for updated documents in both SQLite FTS5 and ChromaDB.
+    - `core/retrieval.py`: Initialized ChromaDB collection with `settings.EMBEDDING_MODEL` embedding function.
+    - `core/retrieval.py`: Implemented Cross-Encoder reranking using `settings.CROSS_ENCODER_MODEL` with heuristic fallback.
+    - `tests/test_retrieval.py`: Added autouse fixture indexing test chunks to ensure isolated passes on clean checkouts.
+  - Merged PR #2 and PR #1 updates into PR #3; all 36 unit tests passing cleanly!
 
 ### Team Collaboration & Merging Status
 * **Teammate Scraper Merged:** Teammate branch `features/scrapper` was reviewed, enhanced to support Annex B schema and Annex A authority levels (1–5), merged into `main`, and pushed to `origin/main`.

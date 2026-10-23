@@ -5,10 +5,11 @@ Implements deterministic conflict resolution across university documents:
 2. Explicit supersession (valid only for Level 1 or 2)
 3. Authority hierarchy (Level 1 > Level 2 > Level 3 > Level 4 > Level 5)
 4. Recency (later effective_from wins among equal authority)
-5. Unresolved conflict detection (returns conflict_flagged)
+5. Unresolved conflict detection (returns conflict_flagged only on genuine contradiction)
 6. Level 5 informational restriction & document instruction immunity (R8)
 """
 
+import re
 import sys
 from pathlib import Path
 from datetime import datetime
@@ -26,10 +27,25 @@ def parse_date(date_str: str) -> Optional[datetime]:
     except ValueError:
         return None
 
+def normalize_section_ref(text: str) -> str:
+    """Normalizes section strings by stripping common prefixes and punctuation."""
+    s = str(text or "").lower().strip()
+    for prefix in ("clause ", "section ", "sec. ", "sec ", "rule "):
+        if s.startswith(prefix):
+            s = s[len(prefix):].strip()
+    return s.replace(" ", "")
+
 def is_scope_applicable(doc_scope: str, student_val: str) -> bool:
-    """Checks if student's programme or batch matches document scope."""
+    """
+    Checks if student's programme or batch matches document scope.
+    If student_val is 'ALL' (general query not specific to one student),
+    general university policies remain applicable.
+    """
     if not doc_scope or doc_scope.strip().upper() == "ALL":
         return True
+    if not student_val or student_val.strip().upper() == "ALL":
+        return True
+
     allowed = [s.strip().lower() for s in doc_scope.split(",")]
     s_val = student_val.strip().lower()
 
@@ -43,6 +59,27 @@ def is_scope_applicable(doc_scope: str, student_val: str) -> bool:
                 pass
         elif item == s_val:
             return True
+    return False
+
+def check_genuine_conflict(item_a: Dict[str, Any], item_b: Dict[str, Any]) -> bool:
+    """Checks whether two same-level, same-date candidate documents have conflicting claims."""
+    text_a = item_a.get("text", "")
+    text_b = item_b.get("text", "")
+
+    # Extract percentage and mark values
+    nums_a = set(re.findall(r"\b\d+(?:\.\d+)?%?\b", text_a))
+    nums_b = set(re.findall(r"\b\d+(?:\.\d+)?%?\b", text_b))
+
+    # If both cite numerical thresholds and they disagree completely on those numbers:
+    if nums_a and nums_b and not (nums_a & nums_b):
+        return True
+
+    # If both reference passing or eligibility with opposite verdicts:
+    lower_a = text_a.lower()
+    lower_b = text_b.lower()
+    if ("pass" in lower_a and "fail" in lower_b) or ("eligible" in lower_a and "detained" in lower_b):
+        return True
+
     return False
 
 def resolve_precedence(
@@ -61,7 +98,7 @@ def resolve_precedence(
             "superseded_chunks": List[Dict],
             "conflicts_detected": List[Dict],
             "precedence_decision": str,
-            "answer_type": str (e.g. 'retrieved_fact', 'conflict_flagged')
+            "answer_type": str ('retrieved_fact', 'conflict_flagged', 'informational_only', 'not_found')
         }
     """
     if not chunks:
@@ -80,12 +117,12 @@ def resolve_precedence(
     applicable = []
     upcoming = []
 
-    # Step 1: Applicability Filter
+    # Step 1: Applicability Filter (as_of_date, scope_programmes, scope_batches)
     for chunk in chunks:
         eff_from = parse_date(chunk.get("effective_from", ""))
         eff_to = parse_date(chunk.get("effective_to", ""))
 
-        # Scope filter
+        # Scope filter (cohort & programme)
         p_scope = chunk.get("scope_programmes", "ALL")
         b_scope = chunk.get("scope_batches", "ALL")
         if not is_scope_applicable(p_scope, programme):
@@ -98,7 +135,7 @@ def resolve_precedence(
             continue
 
         if eff_to and eff_to < as_of_dt:
-            # Expired
+            # Expired document
             continue
 
         applicable.append(chunk)
@@ -117,9 +154,8 @@ def resolve_precedence(
             "answer_type": "not_found"
         }
 
-    # Step 2: Explicit Supersession
-    # A Level 1 or 2 document can explicitly supersede earlier doc_ids or clauses
-    superseded_ids = set()
+    # Step 2: Explicit Supersession (Normalized clause & doc matching)
+    superseded_targets = []
     supersession_reasons = []
 
     for c in applicable:
@@ -127,54 +163,74 @@ def resolve_precedence(
         if auth in (1, 2) and c.get("supersedes"):
             targets = [t.strip() for t in c["supersedes"].split(";") if t.strip()]
             for target in targets:
-                superseded_ids.add(target.lower())
+                t_doc, _, t_sec = target.partition("#")
+                superseded_targets.append((t_doc.strip().lower(), normalize_section_ref(t_sec)))
                 supersession_reasons.append(f"{c.get('doc_id')} explicitly supersedes {target} (step 2)")
 
     surviving = []
     superseded_chunks = []
     for c in applicable:
-        doc_id = c.get("doc_id", "").lower()
-        section = c.get("section", "").lower()
-        full_ref = f"{doc_id}#{section}"
-        if doc_id in superseded_ids or full_ref in superseded_ids:
+        c_doc = c.get("doc_id", "").strip().lower()
+        c_sec_norm = normalize_section_ref(c.get("section", ""))
+        is_superseded = False
+
+        for t_doc, t_sec_norm in superseded_targets:
+            if t_doc == c_doc:
+                if not t_sec_norm or t_sec_norm == c_sec_norm or t_sec_norm in c_sec_norm or c_sec_norm in t_sec_norm:
+                    is_superseded = True
+                    break
+
+        if is_superseded:
             superseded_chunks.append(c)
         else:
             surviving.append(c)
 
     if not surviving and superseded_chunks:
-        # If all were somehow marked superseded, retain the latest superseder
+        # Retain the most recent active superseder
         surviving = [applicable[0]]
 
-    # Step 3 & 4: Authority and Recency Sorting
-    # Filter out Level 5 for authoritative decisions (informational only)
+    # Step 3 & 4: Authority and Recency Filtering
+    # Exclude Level 5 (Informational / Unofficial) from authoritative decisions
     authoritative = [c for c in surviving if int(c.get("authority_level", 5)) < 5]
+    level_5_chunks = [c for c in surviving if int(c.get("authority_level", 5)) >= 5]
+
     if not authoritative:
-        authoritative = surviving
+        # Only Level 5 sources found: strictly informational per Annex A
+        return {
+            "winning_chunk": None,
+            "applicable_chunks": [],
+            "informational_chunks": level_5_chunks,
+            "upcoming_chunks": upcoming,
+            "superseded_chunks": superseded_chunks,
+            "conflicts_detected": [],
+            "precedence_decision": "Only Level 5 informational / unofficial sources found. Cannot be cited as authoritative university regulations per Annex A.",
+            "answer_type": "informational_only"
+        }
 
     def sort_key(c):
         auth = int(c.get("authority_level", 5))
         eff_dt = parse_date(c.get("effective_from", "")) or datetime(1970, 1, 1)
-        # Higher authority = lower integer (1 is highest)
-        # Later date = higher datetime
+        # Higher authority = lower integer (Level 1 beats Level 2)
+        # Later date = higher timestamp
         return (auth, -eff_dt.timestamp())
 
     authoritative.sort(key=sort_key)
     winner = authoritative[0]
 
-    # Step 5: Check for Unresolved Conflicts
-    # If there is another document with equal authority, identical effective date,
-    # and differing content
+    # Step 5: Check for Genuine Unresolved Conflicts
+    # Only flag conflict if another candidate with equal authority and identical effective date has conflicting claims
     conflicts = []
     for other in authoritative[1:]:
         if (int(other.get("authority_level", 5)) == int(winner.get("authority_level", 5)) and
             other.get("effective_from") == winner.get("effective_from") and
             other.get("doc_id") != winner.get("doc_id")):
-            conflicts.append({
-                "doc_a": winner.get("doc_id"),
-                "doc_b": other.get("doc_id"),
-                "authority_level": winner.get("authority_level"),
-                "effective_from": winner.get("effective_from")
-            })
+            if check_genuine_conflict(winner, other):
+                conflicts.append({
+                    "doc_a": winner.get("doc_id"),
+                    "doc_b": other.get("doc_id"),
+                    "authority_level": winner.get("authority_level"),
+                    "effective_from": winner.get("effective_from")
+                })
 
     if conflicts:
         return {
@@ -206,21 +262,3 @@ def resolve_precedence(
         "precedence_decision": "; ".join(decision_parts),
         "answer_type": "retrieved_fact"
     }
-
-if __name__ == "__main__":
-    # Test Annex A.3 worked example from PS:
-    # Academic Regulations level 1 effective 2024-07-01 min attendance 75%
-    # Circular ACAD-2026-08 level 2 effective 2026-08-01 supersedes clause: 80%
-    # Department FAQ level 4 effective 2026-09-15 "65% is enough"
-    test_chunks = [
-        {"doc_id": "ACAD-REG-2024", "section": "Clause 7.2", "authority_level": 1, "effective_from": "2024-07-01", "supersedes": "", "text": "Minimum attendance is 75%."},
-        {"doc_id": "ACAD-2026-08", "section": "Section 1", "authority_level": 2, "effective_from": "2026-08-01", "supersedes": "ACAD-REG-2024#Clause 7.2", "text": "Minimum attendance is 80%."},
-        {"doc_id": "DEPT-FAQ", "section": "Q3", "authority_level": 4, "effective_from": "2026-09-15", "supersedes": "", "text": "65% is enough."}
-    ]
-
-    print("=== Testing Annex A.3 Worked Example ===")
-    res = resolve_precedence(test_chunks, as_of_date="2026-10-06")
-    print("Winner:", res["winning_chunk"]["doc_id"], "-", res["winning_chunk"]["text"])
-    print("Decision:", res["precedence_decision"])
-    assert res["winning_chunk"]["doc_id"] == "ACAD-2026-08", "Failed Annex A.3 worked example!"
-    print("[PASS] Annex A.3 Worked Example passed exactly!")

@@ -16,6 +16,31 @@ def test_annex_a_worked_example():
     assert "explicitly supersedes" in res["precedence_decision"]
     assert res["answer_type"] == "retrieved_fact"
 
+def test_normalized_clause_supersession():
+    """Verify DTU-ORD-2024#Clause R.1(B).22 supersedes section named 'R.1(B).22' (Comment 1)."""
+    test_chunks = [
+        {
+            "doc_id": "DTU-ORD-2024",
+            "section": "R.1(B).22",
+            "authority_level": 1,
+            "effective_from": "2024-07-01",
+            "supersedes": "",
+            "text": "Medical condonation allowed up to 10% (down to 65.0%)."
+        },
+        {
+            "doc_id": "DTU-SYN-AMEND-2026",
+            "section": "Section 1",
+            "authority_level": 2,
+            "effective_from": "2026-08-01",
+            "supersedes": "DTU-ORD-2024#Clause R.1(B).22",
+            "text": "Medical condonation threshold amended to 70.0%."
+        }
+    ]
+    res = resolve_precedence(test_chunks, as_of_date="2026-10-23")
+    assert res["winning_chunk"]["doc_id"] == "DTU-SYN-AMEND-2026"
+    assert len(res["superseded_chunks"]) == 1
+    assert res["superseded_chunks"][0]["doc_id"] == "DTU-ORD-2024"
+
 def test_future_circular_excluded():
     test_chunks = [
         {"doc_id": "DTU-ORD-2024", "section": "R.1(B).22", "authority_level": 1, "effective_from": "2024-07-01", "supersedes": "", "text": "75% attendance."},
@@ -67,10 +92,53 @@ def test_cohort_ordinance_precedence():
     res_2024 = resolve_precedence(test_chunks, as_of_date="2026-10-23", batch_year="2024")
     assert res_2024["winning_chunk"]["doc_id"] == "DTU-ORD-2024"
 
-def test_unresolved_conflict_detection():
+def test_general_query_retains_rules():
+    """General queries without student context (batch_year='ALL') retain university rules (Comment 10)."""
     test_chunks = [
-        {"doc_id": "CIRCULAR-A", "section": "Clause 1", "authority_level": 2, "effective_from": "2024-08-01", "supersedes": "", "text": "Rule A"},
-        {"doc_id": "CIRCULAR-B", "section": "Clause 1", "authority_level": 2, "effective_from": "2024-08-01", "supersedes": "", "text": "Rule B"}
+        {
+            "doc_id": "DTU-ORD-2024",
+            "section": "Clause R.1(B).22",
+            "authority_level": 1,
+            "effective_from": "2024-07-01",
+            "scope_batches": "2024+",
+            "text": "Minimum attendance is 75.0% across all programmes."
+        }
+    ]
+    res = resolve_precedence(test_chunks, as_of_date="2026-10-23", batch_year="ALL")
+    assert res["winning_chunk"] is not None
+    assert res["winning_chunk"]["doc_id"] == "DTU-ORD-2024"
+
+def test_level_5_informational_only():
+    """Level 5 sources cannot decide authoritative answers (Comment 4)."""
+    test_chunks = [
+        {
+            "doc_id": "STUDENT-FORUM-POST",
+            "section": "General Discussion",
+            "authority_level": 5,
+            "effective_from": "2026-09-01",
+            "text": "Someone told me attendance above 60% might get condoned."
+        }
+    ]
+    res = resolve_precedence(test_chunks, as_of_date="2026-10-23")
+    assert res["winning_chunk"] is None
+    assert res["answer_type"] == "informational_only"
+    assert len(res["informational_chunks"]) == 1
+
+def test_agreeing_sources_no_conflict():
+    """Sources with equal authority that agree on policy do NOT flag a conflict (Comment 5)."""
+    test_chunks = [
+        {"doc_id": "CIRCULAR-DEAN", "section": "Notice 1", "authority_level": 2, "effective_from": "2024-08-01", "text": "Minimum attendance is 75% for exam eligibility."},
+        {"doc_id": "CIRCULAR-COE", "section": "Notice 2", "authority_level": 2, "effective_from": "2024-08-01", "text": "Attendance requirement is 75% for admit card issuance."}
+    ]
+    res = resolve_precedence(test_chunks, as_of_date="2024-09-01")
+    assert res["answer_type"] == "retrieved_fact"
+    assert len(res["conflicts_detected"]) == 0
+
+def test_unresolved_conflict_detection():
+    """Genuine contradiction at same authority and date triggers conflict_flagged."""
+    test_chunks = [
+        {"doc_id": "CIRCULAR-A", "section": "Clause 1", "authority_level": 2, "effective_from": "2024-08-01", "supersedes": "", "text": "Passing threshold is 40% aggregate marks."},
+        {"doc_id": "CIRCULAR-B", "section": "Clause 1", "authority_level": 2, "effective_from": "2024-08-01", "supersedes": "", "text": "Passing threshold is 50% aggregate marks."}
     ]
     res = resolve_precedence(test_chunks, as_of_date="2024-09-01")
     assert res["answer_type"] == "conflict_flagged"

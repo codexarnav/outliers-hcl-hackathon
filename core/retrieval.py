@@ -1,5 +1,7 @@
 """
-Hybrid Retrieval Engine (Dense ChromaDB + Sparse SQLite FTS5 BM25 + Reciprocal Rank Fusion)
+Hybrid Retrieval Engine
+Combines SQLite FTS5 BM25 (sparse) with ChromaDB (dense), merges ranks using
+Reciprocal Rank Fusion (RRF), and applies Cross-Encoder reranking (Annex B & PS §2).
 """
 
 import os
@@ -19,6 +21,32 @@ CHROMA_DIR = Path(settings.CHROMA_PERSIST_DIR)
 
 _chroma_client = None
 _chroma_collection = None
+_embedding_fn = None
+_cross_encoder = None
+
+def get_embedding_function():
+    """Initializes sentence-transformers embedding function using configured model."""
+    global _embedding_fn
+    if _embedding_fn is None and not settings.MOCK_LLM:
+        try:
+            from chromadb.utils import embedding_functions
+            _embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+                model_name=settings.EMBEDDING_MODEL
+            )
+        except Exception:
+            _embedding_fn = False
+    return _embedding_fn if _embedding_fn is not False else None
+
+def get_cross_encoder():
+    """Initializes Cross-Encoder model using configured model name."""
+    global _cross_encoder
+    if _cross_encoder is None and not settings.MOCK_LLM:
+        try:
+            from sentence_transformers import CrossEncoder
+            _cross_encoder = CrossEncoder(settings.CROSS_ENCODER_MODEL)
+        except Exception:
+            _cross_encoder = False
+    return _cross_encoder if _cross_encoder is not False else None
 
 def get_chroma_collection():
     global _chroma_client, _chroma_collection
@@ -27,10 +55,14 @@ def get_chroma_collection():
         from chromadb.config import Settings as ChromaSettings
         os.makedirs(CHROMA_DIR, exist_ok=True)
         _chroma_client = chromadb.PersistentClient(path=str(CHROMA_DIR), settings=ChromaSettings(anonymized_telemetry=False))
-        _chroma_collection = _chroma_client.get_or_create_collection(
-            name="dtu_academic_docs",
-            metadata={"description": "Delhi Technological University Regulations and Circulars"}
-        )
+        emb_fn = get_embedding_function()
+        kwargs = {
+            "name": "dtu_academic_docs",
+            "metadata": {"description": "Delhi Technological University Regulations and Circulars"}
+        }
+        if emb_fn is not None:
+            kwargs["embedding_function"] = emb_fn
+        _chroma_collection = _chroma_client.get_or_create_collection(**kwargs)
     return _chroma_collection
 
 def init_fts_table(conn: sqlite3.Connection):
@@ -59,11 +91,13 @@ def index_chunks(chunks: List[Dict[str, Any]]):
     conn = get_connection()
     init_fts_table(conn)
 
-    # 1. Index into SQLite FTS5
+    # 1. Index into SQLite FTS5 (purging obsolete chunks for replaced documents - Comment 6)
+    doc_ids = list({c["doc_id"] for c in chunks if c.get("doc_id")})
     with conn:
+        for doc_id in doc_ids:
+            conn.execute("DELETE FROM chunks_fts WHERE doc_id = ?", (doc_id,))
+
         for c in chunks:
-            # Delete existing if updating
-            conn.execute("DELETE FROM chunks_fts WHERE chunk_id = ?", (c["chunk_id"],))
             conn.execute("""
             INSERT INTO chunks_fts (
                 chunk_id, doc_id, title, section, page, text,
@@ -82,6 +116,12 @@ def index_chunks(chunks: List[Dict[str, Any]]):
 
     # 2. Index into ChromaDB
     collection = get_chroma_collection()
+    for doc_id in doc_ids:
+        try:
+            collection.delete(where={"doc_id": doc_id})
+        except Exception:
+            pass
+
     ids = [c["chunk_id"] for c in chunks]
     documents = [c["text"] for c in chunks]
     metadatas = [{
@@ -95,131 +135,114 @@ def index_chunks(chunks: List[Dict[str, Any]]):
         "supersedes": c.get("supersedes", ""),
         "scope_programmes": c.get("scope_programmes", "ALL"),
         "scope_batches": c.get("scope_batches", "ALL"),
+        "provenance": c.get("provenance", ""),
     } for c in chunks]
 
-    # Batch upsert to ChromaDB
-    batch_size = 100
-    for i in range(0, len(ids), batch_size):
-        collection.upsert(
-            ids=ids[i:i+batch_size],
-            documents=documents[i:i+batch_size],
-            metadatas=metadatas[i:i+batch_size]
-        )
+    collection.upsert(
+        ids=ids,
+        documents=documents,
+        metadatas=metadatas
+    )
 
     return len(chunks)
 
-def search_sparse(query: str, top_k: int = 15) -> List[Dict[str, Any]]:
+def search_sparse(query: str, top_k: int = 10) -> List[Dict[str, Any]]:
+    """Performs SQLite FTS5 BM25 search over ingested chunks."""
     conn = get_connection()
     init_fts_table(conn)
-    
-    # Clean query for FTS5 syntax
-    clean_terms = [t for t in query.replace('"', '').replace("'", '').split() if len(t) > 2]
-    if not clean_terms:
-        clean_terms = query.split()
-    fts_query = " OR ".join(f'"{t}"' for t in clean_terms)
 
-    results = []
+    sanitized = "".join(ch for ch in query if ch.isalnum() or ch.isspace()).strip()
+    if not sanitized:
+        conn.close()
+        return []
+
+    fts_query = " OR ".join(sanitized.split())
+
+    sql = """
+    SELECT chunk_id, doc_id, title, section, CAST(page AS INTEGER) AS page, text,
+           CAST(authority_level AS INTEGER) AS authority_level,
+           effective_from, effective_to, supersedes, scope_programmes, scope_batches,
+           bm25(chunks_fts) AS bm25_score
+    FROM chunks_fts
+    WHERE chunks_fts MATCH ?
+    ORDER BY bm25_score
+    LIMIT ?;
+    """
+
+    cursor = conn.cursor()
     try:
-        cur = conn.execute("""
-        SELECT chunk_id, doc_id, title, section, page, text,
-               authority_level, effective_from, effective_to,
-               supersedes, scope_programmes, scope_batches, rank
-        FROM chunks_fts
-        WHERE chunks_fts MATCH ?
-        ORDER BY rank
-        LIMIT ?
-        """, (fts_query, top_k))
-
-        for row in cur.fetchall():
-            results.append({
-                "chunk_id": row["chunk_id"],
-                "doc_id": row["doc_id"],
-                "title": row["title"],
-                "section": row["section"],
-                "page": int(row["page"]),
-                "text": row["text"],
-                "authority_level": int(row["authority_level"]),
-                "effective_from": row["effective_from"],
-                "effective_to": row["effective_to"],
-                "supersedes": row["supersedes"],
-                "scope_programmes": row["scope_programmes"],
-                "scope_batches": row["scope_batches"],
-                "sparse_rank": row["rank"]
-            })
-    except Exception as e:
-        print(f"[WARN] FTS5 search error: {e}")
+        cursor.execute(sql, (fts_query, top_k))
+        rows = [dict(r) for r in cursor.fetchall()]
+    except sqlite3.OperationalError:
+        rows = []
     finally:
         conn.close()
 
-    return results
+    return rows
 
-def search_dense(query: str, top_k: int = 15) -> List[Dict[str, Any]]:
+def search_dense(query: str, top_k: int = 10) -> List[Dict[str, Any]]:
+    """Performs ChromaDB vector search over chunk embeddings."""
     collection = get_chroma_collection()
-    results = []
-    try:
-        res = collection.query(
-            query_texts=[query],
-            n_results=top_k
-        )
-        if res and res["ids"] and res["ids"][0]:
-            for idx in range(len(res["ids"][0])):
-                meta = res["metadatas"][0][idx]
-                results.append({
-                    "chunk_id": res["ids"][0][idx],
-                    "doc_id": meta["doc_id"],
-                    "title": meta.get("title", ""),
-                    "section": meta.get("section", ""),
-                    "page": int(meta.get("page", 1)),
-                    "text": res["documents"][0][idx],
-                    "authority_level": int(meta.get("authority_level", 1)),
-                    "effective_from": meta.get("effective_from", ""),
-                    "effective_to": meta.get("effective_to", ""),
-                    "supersedes": meta.get("supersedes", ""),
-                    "scope_programmes": meta.get("scope_programmes", "ALL"),
-                    "scope_batches": meta.get("scope_batches", "ALL"),
-                    "dense_distance": res["distances"][0][idx] if res["distances"] else 0.0
-                })
-    except Exception as e:
-        print(f"[WARN] Chroma search error: {e}")
+    if collection.count() == 0:
+        return []
 
-    return results
+    results = collection.query(
+        query_texts=[query],
+        n_results=min(top_k, collection.count())
+    )
 
-def hybrid_search(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
-    """
-    Combines dense and sparse search using Reciprocal Rank Fusion (RRF),
-    followed by cross-scoring reranker.
-    """
-    dense_results = search_dense(query, top_k=15)
-    sparse_results = search_sparse(query, top_k=15)
+    chunks = []
+    if not results or not results["ids"] or not results["ids"][0]:
+        return chunks
 
-    rrf_scores = {}
-    chunk_map = {}
+    for i in range(len(results["ids"][0])):
+        meta = results["metadatas"][0][i]
+        doc = results["documents"][0][i]
+        chunk_id = results["ids"][0][i]
+        dist = results["distances"][0][i] if results.get("distances") else 0.0
 
-    # Dense RRF
-    for rank, item in enumerate(dense_results):
-        cid = item["chunk_id"]
-        chunk_map[cid] = item
-        rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (60 + rank))
+        chunks.append({
+            "chunk_id": chunk_id,
+            "doc_id": meta.get("doc_id"),
+            "title": meta.get("title", ""),
+            "section": meta.get("section", ""),
+            "page": meta.get("page", 1),
+            "text": doc,
+            "authority_level": meta.get("authority_level", 1),
+            "effective_from": meta.get("effective_from", ""),
+            "effective_to": meta.get("effective_to", ""),
+            "supersedes": meta.get("supersedes", ""),
+            "scope_programmes": meta.get("scope_programmes", "ALL"),
+            "scope_batches": meta.get("scope_batches", "ALL"),
+            "provenance": meta.get("provenance", ""),
+            "distance": dist
+        })
 
-    # Sparse RRF
-    for rank, item in enumerate(sparse_results):
-        cid = item["chunk_id"]
-        if cid not in chunk_map:
-            chunk_map[cid] = item
-        rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (60 + rank))
+    return chunks
 
-    # Sort candidates by merged RRF score
-    sorted_candidates = sorted(rrf_scores.items(), key=lambda x: x[1], reverse=True)
+def rerank_candidates(query: str, candidates: List[Dict[str, Any]], top_k: int = 5) -> List[Dict[str, Any]]:
+    """Reranks candidates using Cross-Encoder model with heuristic keyword boost fallback (Comment 9)."""
+    if not candidates:
+        return []
 
-    # Cross-scoring keyword boost (lexical + exact phrase alignment)
-    final_scored = []
+    encoder = get_cross_encoder()
+    if encoder:
+        try:
+            pairs = [[query, c["text"]] for c in candidates]
+            scores = encoder.predict(pairs)
+            for c, s in zip(candidates, scores):
+                c["score"] = round(float(s), 4)
+            return sorted(candidates, key=lambda x: x["score"], reverse=True)[:top_k]
+        except Exception:
+            pass
+
+    # Heuristic scoring fallback for MOCK_LLM or offline environments
     q_lower = query.lower()
-    for cid, rrf_score in sorted_candidates[:15]:
-        item = chunk_map[cid]
+    for item in candidates:
         text_lower = item["text"].lower()
-        score = rrf_score
+        score = item.get("score", 0.0)
 
-        # Boost for exact clause citations (e.g. R.1(B).22)
+        # Boost for exact clause citations
         for term in ["r.1(b).22", "attendance", "supplementary", "cws", "fee", "make-up", "fail"]:
             if term in q_lower and term in text_lower:
                 score += 0.05
@@ -229,23 +252,39 @@ def hybrid_search(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
             score += 0.01
 
         item["score"] = round(score, 4)
-        final_scored.append(item)
 
-    final_scored.sort(key=lambda x: x["score"], reverse=True)
-    return final_scored[:top_k]
+    return sorted(candidates, key=lambda x: x["score"], reverse=True)[:top_k]
 
-if __name__ == "__main__":
-    from core.chunking import chunk_all_documents
-    docs_dir = Path("data/documents")
-    reg_path = Path("data/source_register.csv")
-    print("=== Indexing DTU Documents into ChromaDB & SQLite FTS5 ===")
-    chunks = chunk_all_documents(docs_dir, reg_path)
-    count = index_chunks(chunks)
-    print(f"[SUCCESS] Indexed {count} chunks.")
+def hybrid_search(query: str, top_k: int = 5, rrf_k: int = 60) -> List[Dict[str, Any]]:
+    """
+    Executes Hybrid Retrieval combining Dense (ChromaDB) and Sparse (SQLite FTS5),
+    fuses ranks via Reciprocal Rank Fusion (RRF), and applies Cross-Encoder reranking.
+    """
+    sparse_results = search_sparse(query, top_k=top_k * 2)
+    dense_results = search_dense(query, top_k=top_k * 2)
 
-    print("\n=== Testing Hybrid Retrieval ===")
-    test_q = "What is the minimum attendance required to appear for end-semester exams?"
-    res = hybrid_search(test_q, top_k=3)
-    for i, r in enumerate(res):
-        print(f"Rank {i+1} [Score: {r['score']}] {r['doc_id']} - {r['section']} (p.{r['page']}):")
-        print(f"  {r['text'][:120]}...\n")
+    rrf_scores: Dict[str, float] = {}
+    chunk_map: Dict[str, Dict[str, Any]] = {}
+
+    for rank, item in enumerate(sparse_results):
+        cid = item["chunk_id"]
+        rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (rrf_k + rank + 1))
+        chunk_map[cid] = item
+
+    for rank, item in enumerate(dense_results):
+        cid = item["chunk_id"]
+        rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (rrf_k + rank + 1))
+        if cid not in chunk_map:
+            chunk_map[cid] = item
+
+    if not rrf_scores:
+        return []
+
+    sorted_candidates = sorted(rrf_scores.items(), key=lambda x: x[1], reverse=True)
+    candidate_list = []
+    for cid, score in sorted_candidates[:15]:
+        item = chunk_map[cid]
+        item["score"] = round(score, 4)
+        candidate_list.append(item)
+
+    return rerank_candidates(query, candidate_list, top_k=top_k)
