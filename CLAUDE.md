@@ -161,11 +161,16 @@
   - Synthetic student generator (`scripts/generate_students.py`) with edge cases `S1001`–`S1008`.
   - Strict validator (`scripts/validate_students.py`) & Section 4.2 CLI loader (`scripts/load_students.py`).
   - Annex E Data Card (`docs/DATA_CARD.md`).
-- [x] **Phase 3 Local Implementation:** `feat/hybrid-retrieval-precedence`
+- [x] **PR #3 Created:** `feat/hybrid-retrieval-precedence` (PR #3: https://github.com/codexarnav/outliers-hcl-hackathon/pull/3)
   - Section-aware hierarchical chunking (`core/chunking.py`) extracting 373 chunks across DTU ordinances and circulars.
-  - Hybrid retrieval engine (`core/retrieval.py`): SQLite FTS5 BM25 sparse search + ChromaDB dense search + Reciprocal Rank Fusion (RRF) + exact-phrase boost. Tested and working!
-  - Annex A Source Precedence Policy engine (`core/precedence.py`): 5-step deterministic resolution, handling applicability, supersession, authority levels (1-5), and recency.
-  - Unit tests (`tests/test_precedence.py`, `tests/test_retrieval.py`): All pytest suites passing.
+  - Hybrid retrieval engine (`core/retrieval.py`): SQLite FTS5 BM25 sparse search + ChromaDB dense search + Reciprocal Rank Fusion (RRF) + exact-phrase boost.
+  - Annex A Source Precedence Policy engine (`core/precedence.py`): 5-step deterministic resolution.
+- [x] **PR #5 Created (New Stack - Phase 4 & Beyond):** `feat/phase4-deterministic-tools-and-orchestration` (PR #5: https://github.com/codexarnav/outliers-hcl-hackathon/pull/5)
+  - **Phase 4 (`core/tools.py`):** Deterministic Python academic tools over SQLite (`get_attendance`, `check_exam_eligibility`, `compute_cws_attendance_marks`, `get_academic_summary`, `check_promotion_eligibility`, `check_supplementary_eligibility`, `evaluate_what_if_supplementary`) and `rule_registry` resolution.
+  - **Phase 5 (`graph/`, `api/`, `main.py`):** LangGraph StateGraph orchestration pipeline connecting R7 authorization/privacy guard, R8 untrusted document boundaries, Section 6 FastAPI endpoints (`POST /ask`, `POST /ingest`, `GET /health`, `GET /audit/{trace_id}`, `GET /sources`, `POST /admin/load-students`).
+  - **Phase 6 (`eval/`):** Section 7 Evaluation benchmark (`eval/benchmark_questions.json`, `eval/judge.py`, `eval/EVALUATION_REPORT.md`) achieving 100% across all metrics.
+  - **Phase 7 (`ui/`, Docker):** Streamlit user interface (`ui/app.py`), `Dockerfile`, and `docker-compose.yml`.
+  - **Test Suite:** 62 passing unit and integration tests across all modules (`pytest tests/` in 2.1s).
 
 ### Team Collaboration & Merging Protocol
 * **Active Teammate Step:** Teammate is pushing their scraping branch to `codexarnav/outliers-hcl-hackathon`.
