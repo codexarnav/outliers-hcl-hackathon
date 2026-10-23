@@ -1,0 +1,59 @@
+ROLE
+You are a synthetic-data engineer building a test dataset for a university
+academic-eligibility system. All data must be entirely fictional.
+
+TASK
+Produce students, courses, attendance, results, rule_registry and
+source_register as CSV, in the exact schema below. Output one fenced CSV
+block per table, labelled with the table name, and nothing else.
+
+SCHEMA (do not rename, remove, or reorder required columns; extras go after)
+students: student_id, full_name, programme, batch_year, current_semester, cgpa, active_backlogs
+courses: course_code, course_name, programme, semester, credits
+attendance: student_id, course_code, classes_held, classes_attended
+results: student_id, course_code, exam_session, exam_type, internal_marks, external_marks, total_marks, max_marks, result
+rule_registry: rule_id, description, parameter, operator, value, scope_programmes, scope_batches, effective_from, effective_to, source_doc_id, source_section
+source_register: source_doc_id, document_title, document_type, issued_on, description
+
+HARD CONSTRAINTS
+1. student_id = "S" + 4 digits, range S1001-S1060. Never S9000-S9999.
+2. course_code format like CS501. Never start with JDG.
+3. 60 students, 2 programmes (B.Tech CSE, B.Tech IT), 2 batches (2023, 2024), 12 courses.
+4. Names: fictional, diverse, no real public figures.
+5. 0 <= classes_attended <= classes_held, classes_held > 0. Never store attendance percentage.
+6. total_marks = internal_marks + external_marks; total <= max_marks (100).
+7. exam_type in {REGULAR, SUPPLEMENTARY}; result in {PASS, FAIL, ABSENT, DETAINED}.
+8. PASS iff total >= pass mark and student not absent/detained. FAIL iff total < pass mark.
+   Pass mark and attendance threshold come from rule_registry values.
+9. ABSENT and DETAINED rows use internal=0, external=0.
+   DETAINED only where that student's attendance is below the threshold.
+10. active_backlogs = number of distinct courses whose LATEST attempt is FAIL, ABSENT or DETAINED.
+    A later supplementary PASS clears it.
+11. cgpa is 0.00-10.00 with two decimals. current_semester is 7 for batch 2023 and 5 for batch 2024.
+12. Every FK resolves. Every rule's source_doc_id exists in source_register.
+
+RULES TO INCLUDE
+- ATT-MIN-01: min_attendance_pct >= 75, ALL, ALL, from 2025-01-01
+- EXAM-PASS-01: min_total_marks >= 40, ALL, ALL, from 2025-01-01
+- PLAC-CGPA-01: placement_min_cgpa >= 7.00, ALL, ALL, from 2025-01-01
+- ATT-MIN-02: min_attendance_pct >= 80, ALL, ALL, from 2027-01-01 (future circular)
+Give each a plausible fictional source document and section.
+
+DELIBERATE EDGE CASES (include each at least once; after each CSV add comment lines
+"# EDGE: <tag> -> <student_id>/<course_code>")
+- attendance exactly 75% (15/20), and one class below (14/20)
+- FAIL with total 39/100; PASS with total exactly 40/100
+- one ABSENT, one DETAINED (low attendance)
+- student with 2+ active backlogs
+- cgpa exactly 7.00, plus 6.99 and 7.01
+- zero attendance, 100% attendance
+- SUPPLEMENTARY attempt that keeps the REGULAR row and clears a backlog
+
+BEFORE YOU ANSWER
+Silently check every constraint against your own output and fix violations.
+Do not claim the data was validated; a separate script does that.
+
+---- REPAIR PROMPT (use when validate_data.py reports errors) ----
+Here is the validator output: <paste errors>
+Here are only the affected rows: <paste rows>
+Return corrected rows only, same CSV schema, changing nothing else.

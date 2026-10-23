@@ -1,0 +1,5 @@
+source_doc_id,document_title,document_type,issued_on,description
+SRC-ATT-001,Synthetic Academic Attendance Policy v1,Synthetic policy,2024-12-15,Fictional test document defining a 75% minimum attendance threshold.
+SRC-EXAM-001,Synthetic Examination Rules v1,Synthetic policy,2024-12-15,Fictional test document defining the 40/100 passing threshold.
+SRC-PLAC-001,Synthetic Placement Eligibility Rules v1,Synthetic policy,2024-12-15,Fictional test document defining a CGPA cutoff of 7.00.
+SRC-CIRC-002,Synthetic Attendance Circular 2,Synthetic circular,2026-09-01,Fictional future-effective revision increasing minimum attendance to 80% from 2027-01-01.
