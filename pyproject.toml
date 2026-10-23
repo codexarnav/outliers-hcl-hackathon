@@ -1,0 +1,40 @@
+[project]
+name = "outliers-dtu-assistant"
+version = "0.1.0"
+description = "AI-Powered DTU Student Services Assistant for HCLTech Hackathon"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.28.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "python-multipart>=0.0.9",
+    "langgraph>=0.0.30",
+    "langchain-core>=0.1.30",
+    "chromadb>=0.4.24",
+    "sentence-transformers>=2.5.0",
+    "pypdf>=4.1.0",
+    "pdfplumber>=0.11.0",
+    "reportlab>=4.1.0",
+    "beautifulsoup4>=4.12.0",
+    "pyyaml>=6.0.1",
+    "streamlit>=1.32.0",
+    "httpx>=0.27.0",
+    "python-dotenv>=1.0.1",
+    "rich>=13.7.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0"
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "extractor*", "scraper*", "graph*", "api*", "ui*"]
