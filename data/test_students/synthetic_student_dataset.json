@@ -2705,8 +2705,8 @@
    "course_code": "CS701",
    "exam_session": "2026-AUG",
    "exam_type": "SUPPLEMENTARY",
-   "internal_marks": "15",
-   "external_marks": "30",
+   "internal_marks": "13",
+   "external_marks": "32",
    "total_marks": "45",
    "max_marks": "100",
    "result": "PASS"
