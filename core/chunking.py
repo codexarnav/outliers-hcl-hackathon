@@ -15,6 +15,18 @@ CLAUSE_PATTERN = re.compile(
     re.IGNORECASE
 )
 
+PAGE_MARKER_PATTERN = re.compile(r"(?:---|===|\[)?\s*Page\s+(\d+)\s*(?:---|===|\])?", re.IGNORECASE)
+
+def extract_current_page(text_segment: str, default_page: int = 1) -> int:
+    """Extracts explicit page marker from text if present, otherwise returns default."""
+    matches = list(PAGE_MARKER_PATTERN.finditer(text_segment))
+    if matches:
+        try:
+            return int(matches[-1].group(1))
+        except ValueError:
+            pass
+    return default_page
+
 def load_source_register(register_path: Path) -> Dict[str, Dict[str, Any]]:
     docs = {}
     if not register_path.exists():
@@ -64,6 +76,32 @@ def chunk_pdf(file_path: Path, doc_metadata: Dict[str, Any]) -> List[Dict[str, A
                 "provenance": doc_metadata.get("provenance", ""),
             })
         else:
+            # Handle text continuation before first heading on this page (Comment 3)
+            if split_points[0] > 0:
+                leading_text = text[:split_points[0]].strip()
+                if leading_text:
+                    if chunks:
+                        # Append continuation text to previous clause chunk
+                        chunks[-1]["text"] = chunks[-1]["text"] + "\n\n" + leading_text
+                    else:
+                        chunk_id = f"{doc_id}_P{page_num}_0"
+                        chunks.append({
+                            "chunk_id": chunk_id,
+                            "doc_id": doc_id,
+                            "title": doc_metadata.get("title", ""),
+                            "section": f"Page {page_num} Preamble",
+                            "page": page_num,
+                            "text": leading_text,
+                            "authority_level": int(doc_metadata.get("authority_level", 1)),
+                            "version": doc_metadata.get("version", "1.0"),
+                            "effective_from": doc_metadata.get("effective_from", "2024-07-01"),
+                            "effective_to": doc_metadata.get("effective_to", ""),
+                            "supersedes": doc_metadata.get("supersedes", ""),
+                            "scope_programmes": doc_metadata.get("scope_programmes", "ALL"),
+                            "scope_batches": doc_metadata.get("scope_batches", "ALL"),
+                            "provenance": doc_metadata.get("provenance", ""),
+                        })
+
             # Multiple clauses on one page -> split into clause chunks
             for idx in range(len(split_points)):
                 start = split_points[idx]
@@ -73,7 +111,7 @@ def chunk_pdf(file_path: Path, doc_metadata: Dict[str, Any]) -> List[Dict[str, A
                 m = CLAUSE_PATTERN.search(section_text)
                 section_name = m.group(0).strip(":") if m else f"Page {page_num} Sec {idx+1}"
 
-                chunk_id = f"{doc_id}_P{page_num}_{idx}"
+                chunk_id = f"{doc_id}_P{page_num}_{idx+1}"
                 chunks.append({
                     "chunk_id": chunk_id,
                     "doc_id": doc_id,
@@ -107,7 +145,7 @@ def chunk_text_file(file_path: Path, doc_metadata: Dict[str, Any]) -> List[Dict[
             "doc_id": doc_id,
             "title": doc_metadata.get("title", ""),
             "section": "General",
-            "page": 1,
+            "page": extract_current_page(full_text, default_page=1),
             "text": full_text.strip(),
             "authority_level": int(doc_metadata.get("authority_level", 1)),
             "version": doc_metadata.get("version", "1.0"),
@@ -126,12 +164,15 @@ def chunk_text_file(file_path: Path, doc_metadata: Dict[str, Any]) -> List[Dict[
         clause_text = full_text[start:end].strip()
         section_name = match.group(0).strip(":")
 
+        # Extract explicit page marker from text preceding match (Comment 2)
+        page_num = extract_current_page(full_text[:start], default_page=1)
+
         chunks.append({
             "chunk_id": f"{doc_id}_C{idx+1}",
             "doc_id": doc_id,
             "title": doc_metadata.get("title", ""),
             "section": section_name,
-            "page": max(1, (idx // 2) + 1),
+            "page": page_num,
             "text": clause_text,
             "authority_level": int(doc_metadata.get("authority_level", 1)),
             "version": doc_metadata.get("version", "1.0"),

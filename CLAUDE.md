@@ -153,41 +153,65 @@
 
 ### Completed Milestones
 - [x] Initialized Git repository, set tracking branch to `origin/main`.
-- [x] **PR #1 Created:** `feat/foundation-dtu-corpus-and-mock` (PR #1: https://github.com/codexarnav/outliers-hcl-hackathon/pull/1)
+- [x] **PR #1 Created & Updated:** `feat/foundation-dtu-corpus-and-mock` (PR #1: https://github.com/codexarnav/outliers-hcl-hackathon/pull/1)
   - Scaffolding, `.env.example` with `MOCK_LLM=true` support, `core/config.py`.
   - Authentic DTU document acquisition (`scripts/scrape_dtu.py`), `data/source_register.csv`, `data/seed_rules.sql`.
-- [x] **PR #2 Created:** `feat/sqlite-student-kit` (PR #2: https://github.com/codexarnav/outliers-hcl-hackathon/pull/2)
+  - **Greptile Code Review Addressed:**
+    - `pyproject.toml`: Added setuptools flat-layout discovery (`[tool.setuptools.packages.find]`) to prevent editable build crashes.
+    - `pyproject.toml`: Added missing script dependencies (`reportlab`, `beautifulsoup4`, `pyyaml`).
+    - `data/source_register.csv`: Retained DTU-ORD-2021 validity for 2021–2023 cohorts by clearing `effective_to`.
+    - `data/source_register.csv`: Updated document provenance pointers to official canonical HTTPS links.
+    - `scripts/scrape_dtu.py`: Pinned SHA-256 integrity verification (`e5ce24d...`) for `DTU-ORD-2021.pdf`.
+    - `data/seed_rules.sql` & circulars: Replaced discrete intervals with continuous percentage slabs (`95.0,100.0`, etc.) to eliminate undefined fractional attendance gaps.
+- [x] **PR #2 Created & Updated:** `feat/sqlite-student-kit` (PR #2: https://github.com/codexarnav/outliers-hcl-hackathon/pull/2)
   - SQLite schema (`core/database.py`) for Annex C tables & Annex D `audit_log`.
-  - Synthetic student generator (`scripts/generate_students.py`) with edge cases `S1001`–`S1008`.
-  - Strict validator (`scripts/validate_students.py`) & Section 4.2 CLI loader (`scripts/load_students.py`).
-  - Annex E Data Card (`docs/DATA_CARD.md`).
-- [x] **PR #3 Created:** `feat/hybrid-retrieval-precedence` (PR #3: https://github.com/codexarnav/outliers-hcl-hackathon/pull/3)
-  - Section-aware hierarchical chunking (`core/chunking.py`) extracting 373 chunks across DTU ordinances and circulars.
-  - Hybrid retrieval engine (`core/retrieval.py`): SQLite FTS5 BM25 sparse search + ChromaDB dense search + Reciprocal Rank Fusion (RRF) + exact-phrase boost.
-  - Annex A Source Precedence Policy engine (`core/precedence.py`): 5-step deterministic resolution.
-- [x] **PR #5 Created (New Stack - Phase 4 & Beyond):** `feat/phase4-deterministic-tools-and-orchestration` (PR #5: https://github.com/codexarnav/outliers-hcl-hackathon/pull/5)
+  - **Synthetic Dataset Upgraded to Full 60-Student Corpus:**
+    - Integrated `synthetic_student_dataset_full` (60 students across B.Tech CSE & IT, batches 2023 & 2024, 12 courses, 180 attendance records, 181 results).
+    - Added comprehensive `edge_case_manifest.json` indexing all boundary conditions (75.0% cut-off, detention, supplementary attempts, 39 marks failure, 7.00 CGPA boundaries).
+    - Integrated `sql/derived_features.sql` with deterministic SQL views (`v_attendance_pct`, `v_attendance_status`, `v_marks_gap`, `v_student_overview`).
+    - Validated by both `scripts/validate_students.py` and `scripts/validate_data.py` (0 errors, 0 warnings).
+    - Annex E Data Card (`docs/DATA_CARD.md`) fully updated.
+  - **Greptile Code Review on PR #2 Addressed (All 13 findings resolved):**
+    - `scripts/load_students.py`: Replaced `INSERT OR REPLACE` with `ON CONFLICT DO UPDATE` based on primary keys to prevent `ON DELETE CASCADE` deleting dependent child records during single-table reloads.
+    - `scripts/load_students.py`: Wrapped directory loads in a single atomic database transaction (`with conn:`) to prevent partial commits on failure.
+    - `scripts/validate_students.py`: Added checks for all required columns per table, positive `max_marks`, non-negative score components, `exam_type` validity, and proportional pass mark checking `(total / max_marks) * 100 >= 40.0%`.
+    - `sql/derived_features.sql`: Fixed `classes_short_by` formula in `v_attendance_status` to account for growing total classes held (`ceil((T*held - attended)/(1 - T))`).
+    - `sql/derived_features.sql`: Added `COALESCE` fallbacks for `min_pass_total_pct` and `placement_min_cgpa` in `v_marks_gap` and `v_placement_eligible`.
+    - `sql/derived_features.sql`: Updated `v_latest_attempt` to sort session attempts chronologically by session year/month before exam type.
+    - `scripts/validate_data.py`: Added `"MAKEUP"` to `VALID_EXAM_TYPES`, resolved active rules per-student, and sorted attempts chronologically.
+    - `data/test_students/results.csv` & `synthetic_student_dataset.json`: Preserved `S1003` regular internal marks at 13 in the supplementary attempt.
+    - `scripts/generate_students.py`: Updated to export and synchronize the complete 60-student dataset and edge-case manifest.
+- [x] **PR #3 Created & Merged to Main:** `feat/hybrid-retrieval-precedence` (PR #3: https://github.com/codexarnav/outliers-hcl-hackathon/pull/3)
+  - Section-aware hierarchical chunking (`core/chunking.py`) extracting chunks across DTU ordinances and circulars.
+  - Hybrid retrieval engine (`core/retrieval.py`): SQLite FTS5 BM25 sparse search + ChromaDB dense search + Reciprocal Rank Fusion (RRF) + Cross-Encoder reranker.
+  - Annex A Source Precedence Policy engine (`core/precedence.py`): 5-step deterministic resolution, handling applicability, supersession, authority levels (1-5), recency, and cohort ordinance preservation.
+  - **Greptile Code Review on PR #3 Addressed (All 10 findings resolved):**
+    - `core/precedence.py`: Normalized section references (`normalize_section_ref`) so `DTU-ORD-2024#Clause R.1(B).22` supersedes chunk section `R.1(B).22`.
+    - `core/precedence.py`: Enforced Level 5 informational restriction (`answer_type: informational_only`, `winning_chunk: None`) to prevent unofficial sources from becoming authoritative winners.
+    - `core/precedence.py`: Refined conflict detection to require genuine contradictory claims rather than flagging equal-level agreeing circulars.
+    - `core/precedence.py`: Fixed general queries (`batch_year="ALL"`) to retain university ordinances instead of dropping scoped rules.
+    - `core/chunking.py`: Captured page text preceding first heading as clause continuation instead of dropping it.
+    - `core/chunking.py`: Preserved page numbers from explicit text page markers instead of naive clause-index counting.
+    - `core/retrieval.py`: Deleted obsolete chunk IDs for updated documents in both SQLite FTS5 and ChromaDB.
+    - `core/retrieval.py`: Initialized ChromaDB collection with `settings.EMBEDDING_MODEL` embedding function.
+    - `core/retrieval.py`: Implemented Cross-Encoder reranking using `settings.CROSS_ENCODER_MODEL` with heuristic fallback.
+    - `tests/test_retrieval.py`: Added autouse fixture indexing test chunks to ensure isolated passes on clean checkouts.
+- [x] **PR #5 Created & Updated (New Stack - Phase 4 & Beyond):** `feat/phase4-deterministic-tools-and-orchestration` (PR #5: https://github.com/codexarnav/outliers-hcl-hackathon/pull/5)
   - **Phase 4 (`core/tools.py`):** Deterministic Python academic tools over SQLite (`get_attendance`, `check_exam_eligibility`, `compute_cws_attendance_marks`, `get_academic_summary`, `check_promotion_eligibility`, `check_supplementary_eligibility`, `evaluate_what_if_supplementary`) and `rule_registry` resolution.
   - **Phase 5 (`graph/`, `api/`, `main.py`):** LangGraph StateGraph orchestration pipeline connecting R7 authorization/privacy guard, R8 untrusted document boundaries, Section 6 FastAPI endpoints (`POST /ask`, `POST /ingest`, `GET /health`, `GET /audit/{trace_id}`, `GET /sources`, `POST /admin/load-students`).
   - **Phase 6 (`eval/`):** Section 7 Evaluation benchmark (`eval/benchmark_questions.json`, `eval/judge.py`, `eval/EVALUATION_REPORT.md`) achieving 100% across all metrics.
   - **Phase 7 (`ui/`, Docker):** Streamlit user interface (`ui/app.py`), `Dockerfile`, and `docker-compose.yml`.
-  - **Test Suite:** 62 passing unit and integration tests across all modules (`pytest tests/` in 2.1s).
+  - **Greptile Code Review on PR #5 Addressed (All 28 findings resolved across Phase 4-7):**
+    - Passed all 62 unit and integration tests and Section 7 benchmark with 100% scores.
+  - **Merged Latest `main` (PR #3):** Full alignment with latest database tables, derived views, and hybrid retrieval.
 
-### Team Collaboration & Merging Protocol
-* **Active Teammate Step:** Teammate is pushing their scraping branch to `codexarnav/outliers-hcl-hackathon`.
-* **Incoming Integration Flow:**
-  1. Fetch and checkout teammate's branch:
-     ```bash
-     git fetch origin
-     git checkout <teammate-branch>
-     ```
-  2. Finalize & harmonize teammate's scraping scripts with `data/source_register.csv` and `data/documents/`.
-  3. Merge finalized scraping into `main`:
-     ```bash
-     git checkout main
-     git merge <teammate-branch>
-     git push origin main
-     ```
-  4. Rebase and re-target subsequent PRs (Phase 2 `feat/sqlite-student-kit`, Phase 3 `feat/hybrid-retrieval-precedence`) onto `main`.
+### Team Collaboration & Merging Status
+* **Teammate Scraper Merged:** Teammate branch `features/scrapper` was reviewed, enhanced to support Annex B schema and Annex A authority levels (1–5), merged into `main`, and pushed to `origin/main`.
+* **Current PR Stack:**
+  - PR #1: `feat/foundation-dtu-corpus-and-mock` -> `main`
+  - PR #2: `feat/sqlite-student-kit` -> `feat/foundation-dtu-corpus-and-mock`
+  - PR #3: `feat/hybrid-retrieval-precedence` -> `feat/sqlite-student-kit`
+* **Test Suite:** 32 unit tests passing cleanly (`uv run pytest tests/`). Student validation suites passing cleanly (`validate_students.py`, `validate_data.py`).
 
 ---
 

@@ -5,10 +5,11 @@ Implements deterministic conflict resolution across university documents:
 2. Explicit supersession (valid only for Level 1 or 2)
 3. Authority hierarchy (Level 1 > Level 2 > Level 3 > Level 4 > Level 5)
 4. Recency (later effective_from wins among equal authority)
-5. Unresolved conflict detection (returns conflict_flagged)
+5. Unresolved conflict detection (returns conflict_flagged only on genuine contradiction)
 6. Level 5 informational restriction & document instruction immunity (R8)
 """
 
+import re
 import sys
 from pathlib import Path
 from datetime import datetime
@@ -26,12 +27,72 @@ def parse_date(date_str: str) -> Optional[datetime]:
     except ValueError:
         return None
 
+def normalize_section_ref(text: str) -> str:
+    """Normalizes section strings by stripping common prefixes and punctuation."""
+    s = str(text or "").lower().strip()
+    for prefix in ("clause ", "section ", "sec. ", "sec ", "rule "):
+        if s.startswith(prefix):
+            s = s[len(prefix):].strip()
+    return s.replace(" ", "")
+
+def extract_clause_identifier(text: str) -> Optional[str]:
+    """
+    Extracts the canonical complete clause/section identifier.
+    E.g. 'Clause R.1(B).22: Attendance' -> 'r.1(b).22'
+         'Clause R.1(B).1' -> 'r.1(b).1'
+         'Section 4.1' -> '4.1'
+         'Clause 1' -> '1'
+    """
+    if not text:
+        return None
+    s = str(text).strip()
+    m = re.search(
+        r"(?:clause|section|sec\.?|rule)?\s*([a-zA-Z]\.\s*\d+(?:\([a-zA-Z0-9]+\))*\.\d+|\d+(?:\.\d+)*|[a-zA-Z]+\d+)",
+        s,
+        re.IGNORECASE
+    )
+    if m:
+        return re.sub(r"\s+", "", m.group(1)).lower()
+    return None
+
+def is_clause_match(target_sec: str, chunk_sec: str) -> bool:
+    """
+    Matches target clause reference with chunk section accurately.
+    Prevents prefix collisions like Clause R.1(B).1 matching R.1(B).10 (Comment 12).
+    Allows heading text only after a clear boundary (e.g. colon, dash).
+    """
+    if not target_sec:
+        # Whole document target supersedes all chunks of target doc
+        return True
+    if not chunk_sec:
+        return False
+
+    t_id = extract_clause_identifier(target_sec)
+    c_id = extract_clause_identifier(chunk_sec)
+
+    if t_id and c_id:
+        return t_id == c_id
+
+    # Fallback for non-standard section titles:
+    # Match complete section identifier before boundary (colon, dash, etc.)
+    t_base = re.split(r"[:\-\u2013\u2014]", target_sec, maxsplit=1)[0].strip().lower()
+    c_base = re.split(r"[:\-\u2013\u2014]", chunk_sec, maxsplit=1)[0].strip().lower()
+    t_clean = normalize_section_ref(t_base)
+    c_clean = normalize_section_ref(c_base)
+
+    return bool(t_clean and t_clean == c_clean)
+
 def is_scope_applicable(doc_scope: str, student_val: str) -> bool:
-    """Checks if student's programme or batch matches document scope."""
+    """
+    Checks if student's programme or batch matches document scope.
+    If student_val is 'ALL' (general query not specific to one student),
+    general university policies remain applicable.
+    """
     if not doc_scope or doc_scope.strip().upper() == "ALL":
         return True
     if not student_val or student_val.strip().upper() == "ALL":
         return True
+
     allowed = [s.strip().lower() for s in doc_scope.split(",")]
     s_val = student_val.strip().lower()
 
@@ -47,24 +108,62 @@ def is_scope_applicable(doc_scope: str, student_val: str) -> bool:
             return True
     return False
 
+def check_genuine_conflict(item_a: Dict[str, Any], item_b: Dict[str, Any]) -> bool:
+    """
+    Checks whether two same-level, same-date candidate documents make incompatible claims.
+    Compares specific rule thresholds (percentages, CGPA, credits, marks, duration) and
+    opposing policy verdicts, rather than requiring all numbers to differ (Comment 11).
+    """
+    text_a = item_a.get("text", "")
+    text_b = item_b.get("text", "")
+    lower_a = text_a.lower()
+    lower_b = text_b.lower()
+
+    # 1. Compare percentage thresholds (e.g. 75% vs 80% even when sharing clause numbers)
+    pcts_a = set(re.findall(r"\b\d+(?:\.\d+)?\s*%", text_a))
+    pcts_b = set(re.findall(r"\b\d+(?:\.\d+)?\s*%", text_b))
+    if pcts_a and pcts_b and pcts_a != pcts_b:
+        return True
+
+    # 2. Compare metric-specific values (CGPA, credits, marks, days/duration, fees)
+    metrics = [
+        (r"\b(?:cgpa|sgpa|gpa)\s*(?:of|is|>=|<=|:)?\s*(\d+(?:\.\d+)?)", "gpa"),
+        (r"\b(\d+(?:\.\d+)?)\s*credits?\b", "credits"),
+        (r"\b(\d+(?:\.\d+)?)\s*marks?\b", "marks"),
+        (r"\b(\d+)\s*(?:days?|weeks?|months?)\b", "duration"),
+        (r"(?:rs\.?|inr)\s*([\d,]+)", "fee")
+    ]
+    for pattern, _ in metrics:
+        vals_a = set(re.findall(pattern, lower_a))
+        vals_b = set(re.findall(pattern, lower_b))
+        if vals_a and vals_b and vals_a != vals_b:
+            return True
+
+    # 3. Opposing policy verdicts
+    verdict_pairs = [
+        (r"\beligible\b", r"\b(?:not\s+eligible|ineligible|barred|detained)\b"),
+        (r"\bpermitted\b", r"\b(?:not\s+permitted|prohibited|strictly\s+barred)\b"),
+        (r"\bmandatory\b", r"\boptional\b")
+    ]
+    for pos_pat, neg_pat in verdict_pairs:
+        a_has_pos = bool(re.search(pos_pat, lower_a)) and not bool(re.search(neg_pat, lower_a))
+        b_has_neg = bool(re.search(neg_pat, lower_b))
+        b_has_pos = bool(re.search(pos_pat, lower_b)) and not bool(re.search(neg_pat, lower_b))
+        a_has_neg = bool(re.search(neg_pat, lower_a))
+
+        if (a_has_pos and b_has_neg) or (b_has_pos and a_has_neg):
+            return True
+
+    return False
+
 def resolve_precedence(
     chunks: List[Dict[str, Any]],
-    as_of_date: str = "2026-10-23",
-    programme: str = "ALL",
-    batch_year: str = "ALL"
+    as_of_date: Optional[str] = None,
+    programme: Optional[str] = None,
+    batch_year: Optional[str] = None
 ) -> Dict[str, Any]:
     """
-    Applies the Annex A Source Precedence Policy over candidate chunks or rules.
-    Returns:
-        {
-            "winning_chunk": Dict or None,
-            "applicable_chunks": List[Dict],
-            "upcoming_chunks": List[Dict],
-            "superseded_chunks": List[Dict],
-            "conflicts_detected": List[Dict],
-            "precedence_decision": str,
-            "answer_type": str (e.g. 'retrieved_fact', 'conflict_flagged')
-        }
+    Annex A Deterministic Precedence Resolver.
     """
     if not chunks:
         return {
@@ -73,42 +172,51 @@ def resolve_precedence(
             "upcoming_chunks": [],
             "superseded_chunks": [],
             "conflicts_detected": [],
-            "precedence_decision": "No candidate sources provided.",
+            "precedence_decision": "No chunks provided for precedence resolution.",
             "answer_type": "not_found"
         }
 
-    as_of_dt = parse_date(as_of_date) or datetime.now()
+    if not as_of_date:
+        as_of_date = datetime.now().strftime("%Y-%m-%d")
 
-    applicable = []
-    upcoming = []
+    target_dt = parse_date(as_of_date) or datetime.now()
 
     # Step 1: Applicability Filter
-    for chunk in chunks:
-        eff_from = parse_date(chunk.get("effective_from", ""))
-        eff_to = parse_date(chunk.get("effective_to", ""))
+    applicable = []
+    upcoming = []
+    excluded_scope = []
 
-        # Scope filter
-        p_scope = chunk.get("scope_programmes", "ALL")
-        b_scope = chunk.get("scope_batches", "ALL")
-        if not is_scope_applicable(p_scope, programme):
-            continue
-        if not is_scope_applicable(b_scope, batch_year):
-            continue
+    for c in chunks:
+        # Check scope (programme & batch)
+        p_scope = c.get("scope_programmes", "ALL")
+        b_scope = c.get("scope_batches", "ALL")
 
-        if eff_from and eff_from > as_of_dt:
-            upcoming.append(chunk)
-            continue
+        p_match = is_scope_applicable(p_scope, programme or "ALL")
+        b_match = is_scope_applicable(b_scope, batch_year or "ALL")
 
-        if eff_to and eff_to < as_of_dt:
-            # Expired
+        if not (p_match and b_match):
+            excluded_scope.append(c)
             continue
 
-        applicable.append(chunk)
+        eff_from = parse_date(c.get("effective_from", ""))
+        eff_to = parse_date(c.get("effective_to", ""))
+
+        # Check effective window
+        if eff_from and eff_from > target_dt:
+            # Future rule: cannot be applied for this as_of_date
+            upcoming.append(c)
+            continue
+
+        if eff_to and eff_to < target_dt:
+            # Expired rule
+            continue
+
+        applicable.append(c)
 
     if not applicable:
-        decision = "No currently effective sources found."
+        decision = "No authoritative document is applicable as of the requested date."
         if upcoming:
-            decision += f" Found {len(upcoming)} upcoming future circular(s) effective after {as_of_date}."
+            decision = f"Requested query date ({as_of_date}) precedes effective date of available document(s) ({upcoming[0].get('doc_id')})."
         return {
             "winning_chunk": None,
             "applicable_chunks": [],
@@ -119,116 +227,79 @@ def resolve_precedence(
             "answer_type": "not_found"
         }
 
-    # Step 2: Explicit Supersession
-    # A Level 1 or 2 document can explicitly supersede earlier doc_ids or clauses
-    # Finding #8: Clause-specific supersession must NOT supersede unrelated clauses from the same document
-    superseded_doc_ids = set()
-    superseded_clause_refs = set()
+    # Step 2: Explicit Supersession (Normalized clause & doc matching)
+    superseded_targets = []
     supersession_reasons = []
-
-    def normalize_ref(ref: str) -> str:
-        return ref.lower().replace("clause", "").replace("section", "").replace(" ", "").strip()
 
     for c in applicable:
         auth = int(c.get("authority_level", 5))
         if auth in (1, 2) and c.get("supersedes"):
             targets = [t.strip() for t in c["supersedes"].split(";") if t.strip()]
             for target in targets:
-                if "#" in target:
-                    doc_part, sec_part = target.split("#", 1)
-                    superseded_clause_refs.add((normalize_ref(doc_part), normalize_ref(sec_part)))
-                else:
-                    superseded_doc_ids.add(normalize_ref(target))
+                t_doc, _, t_sec = target.partition("#")
+                superseded_targets.append((t_doc.strip().lower(), t_sec.strip()))
                 supersession_reasons.append(f"{c.get('doc_id')} explicitly supersedes {target} (step 2)")
 
     surviving = []
     superseded_chunks = []
     for c in applicable:
-        doc_id = c.get("doc_id", "").strip()
-        section = c.get("section", "").strip()
-        norm_doc = normalize_ref(doc_id)
-        norm_sec = normalize_ref(section)
+        c_doc = c.get("doc_id", "").strip().lower()
+        c_sec = c.get("section", "")
+        is_superseded = False
 
-        is_doc_superseded = norm_doc in superseded_doc_ids
-        is_clause_superseded = False
-        for s_doc, s_sec in superseded_clause_refs:
-            if norm_doc == s_doc and (norm_sec == s_sec or s_sec in norm_sec or norm_sec in s_sec):
-                is_clause_superseded = True
-                break
+        for t_doc, t_sec in superseded_targets:
+            if t_doc == c_doc:
+                if is_clause_match(t_sec, c_sec):
+                    is_superseded = True
+                    break
 
-        if is_doc_superseded or is_clause_superseded:
+        if is_superseded:
             superseded_chunks.append(c)
         else:
             surviving.append(c)
 
     if not surviving and superseded_chunks:
-        # If all were somehow marked superseded, retain the latest superseder
+        # Retain the most recent active superseder
         surviving = [applicable[0]]
 
-    # Step 3 & 4: Authority and Recency Comparison
-    # Filter out Level 5 for authoritative decisions (informational only)
+    # Step 3 & 4: Authority and Recency Filtering
+    # Exclude Level 5 (Informational / Unofficial) from authoritative decisions
     authoritative = [c for c in surviving if int(c.get("authority_level", 5)) < 5]
+    level_5_chunks = [c for c in surviving if int(c.get("authority_level", 5)) >= 5]
+
     if not authoritative:
-        authoritative = surviving
+        # Only Level 5 sources found: strictly informational per Annex A
+        return {
+            "winning_chunk": None,
+            "applicable_chunks": [],
+            "informational_chunks": level_5_chunks,
+            "upcoming_chunks": upcoming,
+            "superseded_chunks": superseded_chunks,
+            "conflicts_detected": [],
+            "precedence_decision": "Only Level 5 informational / unofficial sources found. Cannot be cited as authoritative university regulations per Annex A.",
+            "answer_type": "informational_only"
+        }
 
-    def is_competing(w: Dict[str, Any], c: Dict[str, Any]) -> bool:
-        """Determines if two candidate documents compete/address the same academic domain topic."""
-        w_doc = w.get("doc_id", "").lower().strip()
-        c_supersedes = c.get("supersedes", "").lower().strip()
-        if w_doc and w_doc in c_supersedes:
-            return True
+    def sort_key(c):
+        auth = int(c.get("authority_level", 5))
+        eff_dt = parse_date(c.get("effective_from", "")) or datetime(1970, 1, 1)
+        # Higher authority = lower integer (Level 1 beats Level 2)
+        # Later date = higher timestamp
+        return (auth, -eff_dt.timestamp())
 
-        domain_topics = [
-            "fee", "tuition", "attendance", "absent", "condonation", "sports",
-            "supplementary", "makeup", "placement", "elective", "cws", "hostel"
-        ]
-        w_text = (w.get("title", "") + " " + w.get("text", "")).lower()
-        c_text = (c.get("title", "") + " " + c.get("text", "")).lower()
-        shared = [t for t in domain_topics if (t in w_text and t in c_text)]
-        return len(shared) > 0
-
-    # Winner starts as top retrieved candidate
+    authoritative.sort(key=sort_key)
     winner = authoritative[0]
 
-    # Evaluate whether any other competing candidate overrides winner on the same topic
-    for candidate in authoritative[1:]:
-        if not is_competing(winner, candidate):
-            continue
-
-        c_auth = int(candidate.get("authority_level", 5))
-        w_auth = int(winner.get("authority_level", 5))
-        c_date = parse_date(candidate.get("effective_from", "")) or datetime(1970, 1, 1)
-        w_date = parse_date(winner.get("effective_from", "")) or datetime(1970, 1, 1)
-
-        # Higher authority prevails on competing topic
-        if c_auth < w_auth:
-            winner = candidate
-        # Equal authority: later effective date prevails
-        elif c_auth == w_auth and c_date > w_date:
-            winner = candidate
-
-    # Step 5: Check for Unresolved Conflicts
-    # Only flag conflict if both documents address the same section/rule or share supersession targets
+    # Step 5: Check for Genuine Unresolved Conflicts
+    # Only flag conflict if another candidate with equal authority and identical effective date has conflicting claims
     conflicts = []
-    winner_supersedes = set(t.strip().lower() for t in winner.get("supersedes", "").split(";") if t.strip())
-    winner_sec = winner.get("section", "").strip().lower()
-    winner_doc = winner.get("doc_id", "")
-
     for other in authoritative[1:]:
         if (int(other.get("authority_level", 5)) == int(winner.get("authority_level", 5)) and
             other.get("effective_from") == winner.get("effective_from") and
-            other.get("doc_id") != winner_doc):
-            
-            other_supersedes = set(t.strip().lower() for t in other.get("supersedes", "").split(";") if t.strip())
-            other_sec = other.get("section", "").strip().lower()
-
-            # Conflict triggers if they target the same section or same supersedes clause
-            shared_supersedes = winner_supersedes & other_supersedes
-            same_section = (winner_sec and other_sec and (winner_sec == other_sec or winner_sec in other_sec or other_sec in winner_sec))
-
-            if shared_supersedes or same_section:
+            other.get("doc_id") != winner.get("doc_id")):
+            if check_genuine_conflict(winner, other):
                 conflicts.append({
-                    "doc_a": winner_doc,
+                    "doc_a": winner.get("doc_id"),
                     "doc_b": other.get("doc_id"),
                     "chunk_a": winner,
                     "chunk_b": other,
