@@ -26,8 +26,17 @@ REQUIRED_COLUMNS = {
     "rule_registry.csv": ["rule_id", "description", "parameter", "operator", "value", "scope_programmes", "scope_batches", "effective_from", "effective_to", "source_doc_id", "source_section"],
     "source_register.csv": ["source_doc_id", "document_title", "document_type", "issued_on", "description"],
 }
-VALID_EXAM_TYPES = {"REGULAR", "SUPPLEMENTARY"}
+VALID_EXAM_TYPES = {"REGULAR", "SUPPLEMENTARY", "MAKEUP"}
 VALID_RESULTS = {"PASS", "FAIL", "ABSENT", "DETAINED"}
+MONTH_ORDER = {"JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6, "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12}
+
+def session_sort_key(attempt):
+    sess = str(attempt.get("exam_session", "")).strip()
+    parts = sess.split("-")
+    year = int(parts[0]) if len(parts) > 0 and parts[0].isdigit() else 0
+    month = MONTH_ORDER.get(parts[1].upper(), 0) if len(parts) > 1 else 0
+    is_supp = 1 if attempt.get("exam_type") in ("SUPPLEMENTARY", "MAKEUP") else 0
+    return (year, month, is_supp)
 
 
 def read_csv(path, filename, errors):
@@ -242,6 +251,15 @@ def main():
         external = num(row, "external_marks", "results.csv", i, errors)
         total = num(row, "total_marks", "results.csv", i, errors)
         maximum = num(row, "max_marks", "results.csv", i, errors)
+        student = student_by_id.get(sid)
+        course = course_by_code.get(code)
+
+        # Resolve active rules specific to this student's programme and batch (Comment 11)
+        cur_pass_rule = active_rule("min_total_marks", student)
+        cur_pass_thresh = float(cur_pass_rule["value"]) if cur_pass_rule else pass_threshold
+        cur_att_rule = active_rule("min_attendance_pct", student)
+        cur_att_thresh = float(cur_att_rule["value"]) if cur_att_rule else attendance_threshold
+
         if None not in (internal, external, total, maximum):
             if min(internal, external, total) < 0:
                 errors.append(f"results.csv row {i}: marks cannot be negative")
@@ -253,15 +271,13 @@ def main():
                 errors.append(f"results.csv row {i}: total_marks ({total:g}) exceeds max_marks ({maximum:g})")
             if internal > maximum or external > maximum:
                 errors.append(f"results.csv row {i}: a component mark exceeds max_marks")
-            if result == "PASS" and pass_threshold is not None and total < pass_threshold:
-                errors.append(f"results.csv row {i}: PASS has total {total:g}, below active pass threshold {pass_threshold:g}")
-            if result == "FAIL" and pass_threshold is not None and total >= pass_threshold:
-                errors.append(f"results.csv row {i}: FAIL has total {total:g}, meeting active pass threshold {pass_threshold:g}")
+            if result == "PASS" and cur_pass_thresh is not None and total < cur_pass_thresh:
+                errors.append(f"results.csv row {i}: PASS has total {total:g}, below active pass threshold {cur_pass_thresh:g}")
+            if result == "FAIL" and cur_pass_thresh is not None and total >= cur_pass_thresh:
+                errors.append(f"results.csv row {i}: FAIL has total {total:g}, meeting active pass threshold {cur_pass_thresh:g}")
             if result in {"ABSENT", "DETAINED"} and (internal != 0 or external != 0 or total != 0):
                 warnings.append(f"results.csv row {i}: {result} record has non-zero marks; confirm this matches the stated policy")
 
-        student = student_by_id.get(sid)
-        course = course_by_code.get(code)
         if student and course and student.get("programme") != course.get("programme"):
             errors.append(f"results.csv row {i}: student programme {student.get('programme')!r} does not match course programme {course.get('programme')!r}")
         if student and course:
@@ -272,9 +288,9 @@ def main():
                 pass
 
         pct = attendance_pct.get((sid, code))
-        if result != "ABSENT" and pct is not None and attendance_threshold is not None and pct < attendance_threshold and result != "DETAINED":
-            errors.append(f"results.csv row {i}: attendance is {pct:.2f}% (<{attendance_threshold:g}%) but result is {result}; check detention policy")
-        if result == "DETAINED" and pct is not None and attendance_threshold is not None and pct >= attendance_threshold:
+        if result != "ABSENT" and pct is not None and cur_att_thresh is not None and pct < cur_att_thresh and result != "DETAINED":
+            errors.append(f"results.csv row {i}: attendance is {pct:.2f}% (<{cur_att_thresh:g}%) but result is {result}; check detention policy")
+        if result == "DETAINED" and pct is not None and cur_att_thresh is not None and pct >= cur_att_thresh:
             warnings.append(f"results.csv row {i}: DETAINED result despite attendance {pct:.2f}% meeting threshold; verify another detention rule applies")
 
     # Programme matching for course registrations and attendance records.
@@ -286,13 +302,13 @@ def main():
                 errors.append(f"{filename} row {i}: student programme {student.get('programme')!r} does not match course programme {course.get('programme')!r}")
 
     # active_backlogs must equal distinct courses whose LATEST attempt is not PASS
-    # (supplementary attempts are later than regular ones).
+    # Chronological session order with tie-breaker for supplementary/makeup attempts (Comment 10)
     for sid, student in student_by_id.items():
         pending = 0
         for (s2, code), attempts in results_by_pair.items():
             if s2 != sid or not attempts:
                 continue
-            latest = sorted(attempts, key=lambda r: (r.get("exam_type") == "SUPPLEMENTARY", r.get("exam_session", "")))[-1]
+            latest = sorted(attempts, key=session_sort_key)[-1]
             if latest.get("result") != "PASS":
                 pending += 1
         declared = num_for_check(student.get("active_backlogs"))
